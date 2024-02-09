@@ -8,12 +8,12 @@ interface Articles {
 	liked: (mongoose.Types.ObjectId | string | null)[];
 }
 
-interface UserDocument extends Document {
+export interface UserDocument extends Document {
 	username: string;
 	email: string;
 	passwordHash: string;
-	projects: (mongoose.Types.ObjectId | string | null)[];
-	articles: Articles[];
+	projects?: (mongoose.Types.ObjectId | string | null)[];
+	articles?: Articles[];
 }
 
 const userSchema = new Schema<UserDocument>(
@@ -40,12 +40,14 @@ const userSchema = new Schema<UserDocument>(
 				{
 					type: mongoose.Schema.Types.ObjectId,
 					ref: 'Article',
+					default: [],
 				},
 			],
 			liked: [
 				{
 					type: mongoose.Schema.Types.ObjectId,
 					ref: 'Article',
+					default: [],
 				},
 			],
 		},
