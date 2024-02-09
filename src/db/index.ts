@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 
-dotenv.config();
+dotenv.config({ path: '../../.env' });
 
 const { MONGODB_URI } = process.env;
 
@@ -11,7 +11,7 @@ if (!MONGODB_URI) {
 
 console.log('connecting to', MONGODB_URI);
 
-const connectToMongoDB = async (): Promise<void> => {
+export const connectToMongoDB = async (): Promise<void> => {
 	try {
 		await mongoose.connect(MONGODB_URI);
 		console.log('connected to MongoDB');

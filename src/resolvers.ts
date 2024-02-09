@@ -2,6 +2,8 @@
 // import { GraphQLError } from 'graphql';
 // import jwt from 'jsonwebtoken';
 
+import { Resolvers } from './types';
+
 // testresolvers
 const books = [
 	{
@@ -13,7 +15,7 @@ const books = [
 		author: 'Paul Auster',
 	},
 ];
-const resolvers = {
+const resolvers: Resolvers = {
 	Query: {
 		books: () => books,
 	},
