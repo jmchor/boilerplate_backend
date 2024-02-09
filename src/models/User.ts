@@ -1,4 +1,6 @@
 import mongoose, { Schema, model, Document, Model } from 'mongoose';
+import Project from './Project';
+import Article from './Article';
 
 interface Articles {
 	authored: (mongoose.Types.ObjectId | string | null)[];
@@ -13,40 +15,45 @@ interface UserDocument extends Document {
 	articles: Articles[];
 }
 
-const userSchema = new Schema<UserDocument>({
-	username: {
-		type: String,
-		required: true,
-	},
-	email: {
-		type: String,
-		required: true,
-	},
-	passwordHash: {
-		type: String,
-		required: true,
-	},
+const userSchema = new Schema<UserDocument>(
+	{
+		username: {
+			type: String,
+			required: true,
+		},
+		email: {
+			type: String,
+			required: true,
+		},
+		passwordHash: {
+			type: String,
+			required: true,
+		},
 
-	projects: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Project',
+		projects: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Project',
+		},
+		articles: {
+			authored: [
+				{
+					type: mongoose.Schema.Types.ObjectId,
+					ref: 'Article',
+				},
+			],
+			liked: [
+				{
+					type: mongoose.Schema.Types.ObjectId,
+					ref: 'Article',
+				},
+			],
+		},
 	},
-	articles: {
-		authored: [
-			{
-				type: mongoose.Schema.Types.ObjectId,
-				ref: 'Article',
-			},
-		],
-		liked: [
-			{
-				type: mongoose.Schema.Types.ObjectId,
-				ref: 'Article',
-			},
-		],
-	},
-});
+	{
+		timestamps: true,
+	}
+);
 
-const UserModel: Model<UserDocument> = model<UserDocument>('UserModel', userSchema);
+const User: Model<UserDocument> = model<UserDocument>('User', userSchema);
 
-export default UserModel;
+export default User;
