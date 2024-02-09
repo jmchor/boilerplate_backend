@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import mongoose, { Document, Schema, model, Model } from 'mongoose';
 import User from './User';
 import Article from './Article';
