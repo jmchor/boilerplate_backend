@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 // This is index.ts
-import { ApolloServer } from '@apollo/server';
+import { ApolloServer, BaseContext } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import resolvers from './resolvers.js';
 import typeDefs from './schema.js';
 
 async function startApolloServer() {
-	const server = new ApolloServer({
+	const server: ApolloServer<BaseContext> = new ApolloServer({
 		typeDefs,
 		resolvers,
 		// context: async ({ req }) => {
