@@ -4,11 +4,11 @@ import User from './User';
 import Article from './Article';
 
 // Define interface for Project document
-interface ProjectDocument extends Document {
+export interface ProjectDocument extends Document {
 	metaData: {
 		title: string;
 		description?: string;
-		createdBy?: mongoose.Types.ObjectId | string; // Reference to User model
+		createdBy: mongoose.Types.ObjectId;
 	};
 	frontend: {
 		framework: ('react-ts' | 'react-js' | 'vanilla-js' | 'next-js')[];
@@ -18,7 +18,18 @@ interface ProjectDocument extends Document {
 		framework: ('node-ts' | 'node-js' | 'node-express-ts' | 'node-express-js')[];
 		dataLayer?: ('graphql-server' | '')[];
 		cms?: ('keystone' | '')[];
-		packages: ('jwt' | 'cors' | 'bcrypt' | '')[];
+		packages: (
+			| 'jwt'
+			| 'cors'
+			| 'bcrypt'
+			| 'tsx'
+			| 'dotenv'
+			| '@graphql-codegen/cli'
+			| '@graphql-codegen/typescript'
+			| '@graphql-codegen/typescript-resolvers'
+			| 'nodemon'
+			| 'tsup'
+		)[];
 		database: ('mongodb' | 'postgres')[];
 	};
 	kanban: mongoose.Types.ObjectId | string | null; // Reference to Kanban model
@@ -75,9 +86,27 @@ const projectSchema = new Schema<ProjectDocument>(
 				default: [],
 			},
 			packages: {
-				type: [{ type: String, enum: ['jwt', 'cors', 'bcrypt', ''] }],
+				type: [
+					{
+						type: String,
+						enum: [
+							'jwt',
+							'cors',
+							'bcrypt',
+							'tsx',
+							'dotenv',
+							'@graphql-codegen/cli',
+							'@graphql-codegen/typescript',
+							'@graphql-codegen/typescript-resolvers',
+							'nodemon',
+							'tsup',
+							'',
+						],
+					},
+				],
 				default: [],
 			},
+
 			database: {
 				type: [{ type: String, enum: ['mongodb', 'postgres'] }],
 				default: [],
