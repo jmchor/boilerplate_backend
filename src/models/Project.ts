@@ -2,56 +2,50 @@
 import mongoose, { Document, Schema, model, Model } from 'mongoose';
 import User from './User';
 import Article from './Article';
+import { Packages } from '../types/packages';
 
 // Define interface for Project document
 export interface ProjectDocument extends Document {
-	metaData: {
-		title: string;
-		description?: string;
-		createdBy: mongoose.Types.ObjectId;
-	};
+	title: string;
+	description?: string;
+	createdBy: string | mongoose.Types.ObjectId;
+
 	frontend: {
 		framework: ('react-ts' | 'react-js' | 'vanilla-js' | 'next-js')[];
 		dataLayer?: 'graphql-client'[];
+		packages: Packages[];
 	};
 	backend: {
 		framework: ('node-ts' | 'node-js' | 'node-express-ts' | 'node-express-js')[];
+		moduleType: ('commonjs' | 'module')[];
 		dataLayer?: ('graphql-server' | '')[];
 		cms?: ('keystone' | '')[];
-		packages: (
-			| 'jwt'
-			| 'cors'
-			| 'bcrypt'
-			| 'tsx'
-			| 'dotenv'
-			| '@graphql-codegen/cli'
-			| '@graphql-codegen/typescript'
-			| '@graphql-codegen/typescript-resolvers'
-			| 'nodemon'
-			| 'tsup'
-		)[];
+		packages: Packages[];
 		database: ('mongodb' | 'postgres')[];
 	};
-	kanban: mongoose.Types.ObjectId | string | null; // Reference to Kanban model
-	articles: (mongoose.Types.ObjectId | string)[]; // Array of references to Article model
+	installScripts?: {
+		frontend?: string;
+		backend?: string;
+	};
+	kanban?: mongoose.Types.ObjectId | string | null; // Reference to Kanban model
+	articles?: (mongoose.Types.ObjectId | string)[]; // Array of references to Article model
 }
 
 // Define mongoose schema for Project
 const projectSchema = new Schema<ProjectDocument>(
 	{
-		metaData: {
-			title: {
-				type: String,
-				required: true,
-			},
-			description: {
-				type: String,
-			},
-			createdBy: {
-				type: Schema.Types.ObjectId,
-				ref: 'User',
-			},
+		title: {
+			type: String,
+			required: true,
 		},
+		description: {
+			type: String,
+		},
+		createdBy: {
+			type: Schema.Types.ObjectId,
+			ref: 'User',
+		},
+
 		frontend: {
 			framework: {
 				type: [
@@ -62,8 +56,26 @@ const projectSchema = new Schema<ProjectDocument>(
 				],
 				default: [],
 			},
+
 			dataLayer: {
 				type: [{ type: String, enum: ['graphql-client'] }],
+				default: [],
+			},
+			packages: {
+				type: [
+					{
+						type: String,
+						enum: [
+							'tsx',
+							'nodemon',
+							'tsup',
+							'@apollo/client',
+							'graphql',
+							'typescript',
+							'@types/nodemon',
+						],
+					},
+				],
 				default: [],
 			},
 		},
@@ -75,6 +87,10 @@ const projectSchema = new Schema<ProjectDocument>(
 						enum: ['node-ts', 'node-js', 'node-express-ts', 'node-express-js'],
 					},
 				],
+				default: [],
+			},
+			moduleType: {
+				type: [{ type: String, enum: ['commonjs', 'module'] }],
 				default: [],
 			},
 			dataLayer: {
@@ -90,9 +106,9 @@ const projectSchema = new Schema<ProjectDocument>(
 					{
 						type: String,
 						enum: [
-							'jwt',
+							'jsonwebtoken',
 							'cors',
-							'bcrypt',
+							'bcryptjs',
 							'tsx',
 							'dotenv',
 							'@graphql-codegen/cli',
@@ -100,7 +116,18 @@ const projectSchema = new Schema<ProjectDocument>(
 							'@graphql-codegen/typescript-resolvers',
 							'nodemon',
 							'tsup',
-							'',
+							'@apollo/client',
+							'graphql',
+							'typescript',
+							'@types/node',
+							'mongoose',
+							'@apollo/server',
+							'pg',
+							'@types/jsonwebtoken',
+							'@types/bcryptjs',
+							'@types/cors',
+							'@types/nodemon',
+							'@types/pg',
 						],
 					},
 				],
@@ -123,6 +150,17 @@ const projectSchema = new Schema<ProjectDocument>(
 				ref: 'Articles',
 			},
 		],
+
+		installScripts: {
+			frontend: {
+				type: String,
+				default: null,
+			},
+			backend: {
+				type: String,
+				default: null,
+			},
+		},
 	},
 	{
 		timestamps: true,
