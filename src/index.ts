@@ -4,6 +4,7 @@ import { ApolloServer, BaseContext } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import resolvers from './resolvers.js';
 import typeDefs from './schema.js';
+import { connectToMongoDB } from './db/index.js';
 
 async function startApolloServer() {
 	const server: ApolloServer<BaseContext> = new ApolloServer({
@@ -34,5 +35,5 @@ async function startApolloServer() {
     📭  Query at ${url}
   `);
 }
-
+await connectToMongoDB();
 await startApolloServer();
