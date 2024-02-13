@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
-dotenv.config({ path: '../../.env' });
+dotenv.config({ path: '../.env' }); // load .env file from the path relative to where the function is envoked --> src/index.ts
 
 const { MONGODB_URI } = process.env;
 
