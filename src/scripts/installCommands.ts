@@ -2,15 +2,13 @@ import Project, { ProjectDocument } from '../models/Project';
 import { Packages } from '../types/packages.js';
 
 // Function to generate the npm install commands
-export const generateInstallCommands = async (projectId: string) => {
+export const generateInstallCommands = async (projectId: string): Promise<ProjectDocument> => {
 	try {
 		// Fetch project data from the database
 		const project: ProjectDocument = await Project.findById(projectId);
 		if (!project) {
 			throw new Error(`Project with ID ${projectId} not found`);
 		}
-
-		console.log('PROJECT', project.title);
 
 		const { frontend, backend, title } = project;
 		const {
@@ -134,8 +132,8 @@ export const generateInstallCommands = async (projectId: string) => {
 
 		project.installScripts.frontend = frontendInstallCommands;
 		project.installScripts.backend = backendInstallCommands;
-		const updatedProject = await project.save();
-		console.log('Project installScripts updated successfully:', updatedProject);
+		await project.save();
+		return project;
 	} catch (error) {
 		console.error('Error generating npm install commands:', error.message);
 		throw error; // Re-throw the error to be handled by the caller
