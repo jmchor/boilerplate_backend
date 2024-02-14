@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 import { GraphQLResolveInfo } from 'graphql';
 
 export type Maybe<T> = T | null;
@@ -7,6 +8,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
 	ID: { input: string; output: string };
@@ -16,15 +18,198 @@ export type Scalars = {
 	Float: { input: number; output: number };
 };
 
+export type Article = {
+	__typename?: 'Article';
+	_id: Scalars['ID']['output'];
+	createdBy?: Maybe<User>;
+	externalLink?: Maybe<Scalars['String']['output']>;
+	imageUrl?: Maybe<Scalars['String']['output']>;
+	linkedProjects?: Maybe<Array<Maybe<Project>>>;
+	text: Scalars['String']['output'];
+	title: Scalars['String']['output'];
+};
+
+export type ArticleInput = {
+	createdBy?: InputMaybe<Scalars['ID']['input']>;
+	externalLink?: InputMaybe<Scalars['String']['input']>;
+	imageUrl?: InputMaybe<Scalars['String']['input']>;
+	text: Scalars['String']['input'];
+	title: Scalars['String']['input'];
+};
+
+export type BackendConfig = {
+	__typename?: 'BackendConfig';
+	cms?: Maybe<Cms>;
+	database?: Maybe<Database>;
+	environment: BackendEnv;
+	gqlServer?: Maybe<Scalars['Boolean']['output']>;
+	moduleType?: Maybe<ModuleType>;
+	packages: Array<Packages>;
+};
+
+export type BackendConfigInput = {
+	cms?: InputMaybe<Cms>;
+	database?: InputMaybe<Database>;
+	environment: BackendEnv;
+	gqlServer?: InputMaybe<Scalars['Boolean']['input']>;
+	moduleType?: InputMaybe<ModuleType>;
+	packages: Array<Packages>;
+};
+
+export enum BackendEnv {
+	NodeExpressJs = 'nodeExpressJS',
+	NodeExpressTs = 'nodeExpressTS',
+	Nodejs = 'nodejs',
+	Nodets = 'nodets',
+}
+
 export type Book = {
 	__typename?: 'Book';
 	author?: Maybe<Scalars['String']['output']>;
 	title?: Maybe<Scalars['String']['output']>;
 };
 
+export enum Cms {
+	KeystoneJs = 'keystoneJS',
+	Strapi = 'strapi',
+}
+
+export enum Database {
+	Mongodb = 'mongodb',
+	Postgres = 'postgres',
+}
+
+export enum FrontFrame {
+	Nextjs = 'nextjs',
+	Reactjs = 'reactjs',
+	Reactts = 'reactts',
+	Vanillajs = 'vanillajs',
+}
+
+export type FrontendConfig = {
+	__typename?: 'FrontendConfig';
+	framework?: Maybe<FrontFrame>;
+	gqlClient?: Maybe<Scalars['Boolean']['output']>;
+	packages: Array<Packages>;
+};
+
+export type FrontendConfigInput = {
+	framework?: InputMaybe<FrontFrame>;
+	gqlClient?: InputMaybe<Scalars['Boolean']['input']>;
+	packages: Array<Packages>;
+};
+
+export type InstallScripts = {
+	__typename?: 'InstallScripts';
+	backend?: Maybe<Scalars['String']['output']>;
+	frontend?: Maybe<Scalars['String']['output']>;
+};
+
+export type InstallScriptsInput = {
+	backend?: InputMaybe<Scalars['String']['input']>;
+	frontend?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type Kanban = {
+	__typename?: 'Kanban';
+	_id: Scalars['ID']['output'];
+	backlog?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+	createdBy: User;
+	doing?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+	done?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+	project: Project;
+	todo?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+};
+
+export type KanbanInput = {
+	backlog?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+	createdBy: Scalars['ID']['input'];
+	doing?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+	done?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+	project: Scalars['ID']['input'];
+	todo?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+export enum ModuleType {
+	Commonjs = 'commonjs',
+	Module = 'module',
+}
+
+export type Mutation = {
+	__typename?: 'Mutation';
+	addInstallScript?: Maybe<Project>;
+	createProject?: Maybe<Project>;
+};
+
+export type MutationAddInstallScriptArgs = {
+	_id: Scalars['ID']['input'];
+};
+
+export type MutationCreateProjectArgs = {
+	articles?: InputMaybe<Array<InputMaybe<ArticleInput>>>;
+	backend: BackendConfigInput;
+	createdBy: Scalars['ID']['input'];
+	description?: InputMaybe<Scalars['String']['input']>;
+	frontend: FrontendConfigInput;
+	installScripts?: InputMaybe<InstallScriptsInput>;
+	kanban?: InputMaybe<KanbanInput>;
+	title: Scalars['String']['input'];
+};
+
+export enum Packages {
+	GraphqlCodegenCli = '@graphql-codegen/cli',
+	GraphqlCodegenTypescript = '@graphql-codegen/typescript',
+	GraphqlCodegenTypescriptResolvers = '@graphql-codegen/typescript-resolvers',
+	ApolloClient = '@apollo/client',
+	ApolloServer = '@apollo/server',
+	Bcryptjs = 'bcryptjs',
+	Cors = 'cors',
+	Dotenv = 'dotenv',
+	Express = 'express',
+	Graphql = 'graphql',
+	GraphqlTag = 'graphql-tag',
+	Jsonwebtoken = 'jsonwebtoken',
+	Mongoose = 'mongoose',
+	Nodemon = 'nodemon',
+	Pg = 'pg',
+	Tsup = 'tsup',
+	Tsx = 'tsx',
+	TypesBcryptjs = '@types/bcryptjs',
+	TypesCors = '@types/cors',
+	TypesExpress = '@types/express',
+	TypesJsonwebtoken = '@types/jsonwebtoken',
+	TypesNode = '@types/node',
+	TypesNodemon = '@types/nodemon',
+	TypesPg = '@types/pg',
+	Typescript = 'typescript',
+}
+
+export type Project = {
+	__typename?: 'Project';
+	_id?: Maybe<Scalars['ID']['output']>;
+	articles?: Maybe<Array<Maybe<Article>>>;
+	backend: BackendConfig;
+	createdBy: Scalars['ID']['output'];
+	description?: Maybe<Scalars['String']['output']>;
+	frontend: FrontendConfig;
+	installScripts?: Maybe<InstallScripts>;
+	kanban?: Maybe<Kanban>;
+	title: Scalars['String']['output'];
+};
+
 export type Query = {
 	__typename?: 'Query';
 	books?: Maybe<Array<Maybe<Book>>>;
+};
+
+export type User = {
+	__typename?: 'User';
+	_id: Scalars['ID']['output'];
+	articles?: Maybe<Array<Maybe<Article>>>;
+	email: Scalars['String']['output'];
+	passwordHash: Scalars['String']['output'];
+	projects?: Maybe<Array<Maybe<Project>>>;
+	username: Scalars['String']['output'];
 };
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
@@ -99,18 +284,79 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
+	Article: ResolverTypeWrapper<Article>;
+	ArticleInput: ArticleInput;
+	BackendConfig: ResolverTypeWrapper<BackendConfig>;
+	BackendConfigInput: BackendConfigInput;
+	BackendEnv: BackendEnv;
 	Book: ResolverTypeWrapper<Book>;
 	Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+	CMS: Cms;
+	Database: Database;
+	FrontFrame: FrontFrame;
+	FrontendConfig: ResolverTypeWrapper<FrontendConfig>;
+	FrontendConfigInput: FrontendConfigInput;
+	ID: ResolverTypeWrapper<Scalars['ID']['output']>;
+	InstallScripts: ResolverTypeWrapper<InstallScripts>;
+	InstallScriptsInput: InstallScriptsInput;
+	Kanban: ResolverTypeWrapper<Kanban>;
+	KanbanInput: KanbanInput;
+	ModuleType: ModuleType;
+	Mutation: ResolverTypeWrapper<{}>;
+	Packages: Packages;
+	Project: ResolverTypeWrapper<Project>;
 	Query: ResolverTypeWrapper<{}>;
 	String: ResolverTypeWrapper<Scalars['String']['output']>;
+	User: ResolverTypeWrapper<User>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
+	Article: Article;
+	ArticleInput: ArticleInput;
+	BackendConfig: BackendConfig;
+	BackendConfigInput: BackendConfigInput;
 	Book: Book;
 	Boolean: Scalars['Boolean']['output'];
+	FrontendConfig: FrontendConfig;
+	FrontendConfigInput: FrontendConfigInput;
+	ID: Scalars['ID']['output'];
+	InstallScripts: InstallScripts;
+	InstallScriptsInput: InstallScriptsInput;
+	Kanban: Kanban;
+	KanbanInput: KanbanInput;
+	Mutation: {};
+	Project: Project;
 	Query: {};
 	String: Scalars['String']['output'];
+	User: User;
+};
+
+export type ArticleResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['Article'] = ResolversParentTypes['Article'],
+> = {
+	_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+	createdBy?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+	externalLink?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+	imageUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+	linkedProjects?: Resolver<Maybe<Array<Maybe<ResolversTypes['Project']>>>, ParentType, ContextType>;
+	text?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+	title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BackendConfigResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['BackendConfig'] = ResolversParentTypes['BackendConfig'],
+> = {
+	cms?: Resolver<Maybe<ResolversTypes['CMS']>, ParentType, ContextType>;
+	database?: Resolver<Maybe<ResolversTypes['Database']>, ParentType, ContextType>;
+	environment?: Resolver<ResolversTypes['BackendEnv'], ParentType, ContextType>;
+	gqlServer?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+	moduleType?: Resolver<Maybe<ResolversTypes['ModuleType']>, ParentType, ContextType>;
+	packages?: Resolver<Array<ResolversTypes['Packages']>, ParentType, ContextType>;
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type BookResolvers<
@@ -122,6 +368,73 @@ export type BookResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type FrontendConfigResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['FrontendConfig'] = ResolversParentTypes['FrontendConfig'],
+> = {
+	framework?: Resolver<Maybe<ResolversTypes['FrontFrame']>, ParentType, ContextType>;
+	gqlClient?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+	packages?: Resolver<Array<ResolversTypes['Packages']>, ParentType, ContextType>;
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type InstallScriptsResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['InstallScripts'] = ResolversParentTypes['InstallScripts'],
+> = {
+	backend?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+	frontend?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type KanbanResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['Kanban'] = ResolversParentTypes['Kanban'],
+> = {
+	_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+	backlog?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+	createdBy?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+	doing?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+	done?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+	project?: Resolver<ResolversTypes['Project'], ParentType, ContextType>;
+	todo?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type MutationResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation'],
+> = {
+	addInstallScript?: Resolver<
+		Maybe<ResolversTypes['Project']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationAddInstallScriptArgs, '_id'>
+	>;
+	createProject?: Resolver<
+		Maybe<ResolversTypes['Project']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationCreateProjectArgs, 'backend' | 'createdBy' | 'frontend' | 'title'>
+	>;
+};
+
+export type ProjectResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['Project'] = ResolversParentTypes['Project'],
+> = {
+	_id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+	articles?: Resolver<Maybe<Array<Maybe<ResolversTypes['Article']>>>, ParentType, ContextType>;
+	backend?: Resolver<ResolversTypes['BackendConfig'], ParentType, ContextType>;
+	createdBy?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+	description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+	frontend?: Resolver<ResolversTypes['FrontendConfig'], ParentType, ContextType>;
+	installScripts?: Resolver<Maybe<ResolversTypes['InstallScripts']>, ParentType, ContextType>;
+	kanban?: Resolver<Maybe<ResolversTypes['Kanban']>, ParentType, ContextType>;
+	title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type QueryResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query'],
@@ -129,7 +442,28 @@ export type QueryResolvers<
 	books?: Resolver<Maybe<Array<Maybe<ResolversTypes['Book']>>>, ParentType, ContextType>;
 };
 
+export type UserResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User'],
+> = {
+	_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+	articles?: Resolver<Maybe<Array<Maybe<ResolversTypes['Article']>>>, ParentType, ContextType>;
+	email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+	passwordHash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+	projects?: Resolver<Maybe<Array<Maybe<ResolversTypes['Project']>>>, ParentType, ContextType>;
+	username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type Resolvers<ContextType = any> = {
+	Article?: ArticleResolvers<ContextType>;
+	BackendConfig?: BackendConfigResolvers<ContextType>;
 	Book?: BookResolvers<ContextType>;
+	FrontendConfig?: FrontendConfigResolvers<ContextType>;
+	InstallScripts?: InstallScriptsResolvers<ContextType>;
+	Kanban?: KanbanResolvers<ContextType>;
+	Mutation?: MutationResolvers<ContextType>;
+	Project?: ProjectResolvers<ContextType>;
 	Query?: QueryResolvers<ContextType>;
+	User?: UserResolvers<ContextType>;
 };
