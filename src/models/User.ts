@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import mongoose, { Schema, model, Document, Model } from 'mongoose';
-import Project from './Project';
+import ProjectModel from './Project';
 import Article from './Article';
 
 interface Articles {
@@ -33,7 +33,7 @@ const userSchema = new Schema<UserDocument>(
 
 		projects: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Project',
+			ref: 'ProjectModel',
 		},
 		articles: {
 			authored: [
