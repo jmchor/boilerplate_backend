@@ -1,28 +1,19 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import mongoose, { Document, Schema, model, Model } from 'mongoose';
+
+import { FrontendConfig, BackendConfig } from '../types';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import User from './User';
 import Article from './Article';
-import { Packages } from '../types/packages';
 
 // Define interface for Project document
 export interface ProjectDocument extends Document {
+	_id?: mongoose.Types.ObjectId;
 	title: string;
 	description?: string;
 	createdBy: string | mongoose.Types.ObjectId;
 
-	frontend: {
-		framework: ('react-ts' | 'react-js' | 'vanilla-js' | 'next-js')[];
-		dataLayer?: 'graphql-client'[];
-		packages: Packages[];
-	};
-	backend: {
-		framework: ('node-ts' | 'node-js' | 'node-express-ts' | 'node-express-js')[];
-		moduleType: ('commonjs' | 'module')[];
-		dataLayer?: ('graphql-server' | '')[];
-		cms?: ('keystone' | '')[];
-		packages: Packages[];
-		database: ('mongodb' | 'postgres')[];
-	};
+	frontend: FrontendConfig;
+	backend: BackendConfig;
 	installScripts?: {
 		frontend?: string;
 		backend?: string;
@@ -48,18 +39,14 @@ const projectSchema = new Schema<ProjectDocument>(
 
 		frontend: {
 			framework: {
-				type: [
-					{
-						type: String,
-						enum: ['react-ts', 'react-js', 'vanilla-js', 'next-js'],
-					},
-				],
-				default: [],
+				type: String,
+				enum: ['reactts', 'reactjs', 'vanillajs', 'nextjs'],
+				default: null,
 			},
 
-			dataLayer: {
-				type: [{ type: String, enum: ['graphql-client'] }],
-				default: [],
+			gqlClient: {
+				type: Boolean,
+				default: false,
 			},
 			packages: {
 				type: [
@@ -80,26 +67,25 @@ const projectSchema = new Schema<ProjectDocument>(
 			},
 		},
 		backend: {
-			framework: {
-				type: [
-					{
-						type: String,
-						enum: ['node-ts', 'node-js', 'node-express-ts', 'node-express-js'],
-					},
-				],
-				default: [],
+			environment: {
+				type: String,
+				enum: ['nodets', 'nodejs', 'nodeExpressTS', 'nodeExpressJS'],
+
+				default: null,
 			},
 			moduleType: {
-				type: [{ type: String, enum: ['commonjs', 'module'] }],
-				default: [],
+				type: String,
+				enum: ['commonjs', 'module'],
+				default: null,
 			},
-			dataLayer: {
-				type: [{ type: String, enum: ['graphql-server'] }],
-				default: [],
+			gqlServer: {
+				type: Boolean,
+				default: false,
 			},
 			cms: {
-				type: [{ type: String, enum: ['keystone'] }],
-				default: [],
+				type: String,
+				enum: ['keystoneJS', 'strapi'],
+				default: null,
 			},
 			packages: {
 				type: [
@@ -135,14 +121,15 @@ const projectSchema = new Schema<ProjectDocument>(
 			},
 
 			database: {
-				type: [{ type: String, enum: ['mongodb', 'postgres'] }],
-				default: [],
+				type: String,
+				enum: ['mongodb', 'postgres'],
+				default: null,
 			},
 		},
 		kanban: {
 			type: Schema.Types.ObjectId,
 			ref: 'Kanban',
-			default: null,
+			default: '',
 		},
 		articles: [
 			{
@@ -168,6 +155,6 @@ const projectSchema = new Schema<ProjectDocument>(
 );
 
 // Define mongoose model for Project
-const Project: Model<ProjectDocument> = model<ProjectDocument>('Project', projectSchema);
+const ProjectModel: Model<ProjectDocument> = model<ProjectDocument>('ProjectModel', projectSchema);
 
-export default Project;
+export default ProjectModel;
