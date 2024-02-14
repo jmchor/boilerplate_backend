@@ -1,5 +1,4 @@
 import gql from 'graphql-tag';
-import { ModuleType, Database } from './types/backend';
 
 // test stuff
 const typeDefs = gql`
