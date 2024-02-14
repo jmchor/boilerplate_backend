@@ -1,122 +1,152 @@
-import Project, { ProjectDocument } from '../models/Project';
-import { Packages } from '../types/packages.js';
+import ProjectModel, { ProjectDocument } from '../models/Project.js';
+
+import { ModuleType, FrontFrame, BackendEnv, Cms, Database, Packages } from '../types.js';
 
 // Function to generate the npm install commands
 export const generateInstallCommands = async (projectId: string): Promise<ProjectDocument> => {
 	try {
 		// Fetch project data from the database
-		const project: ProjectDocument = await Project.findById(projectId);
-		if (!project) {
-			throw new Error(`Project with ID ${projectId} not found`);
-		}
+
+		const project = await ProjectModel.findById(projectId);
 
 		const { frontend, backend, title } = project;
-		const {
-			framework: frontendFramework,
-			dataLayer: frontendDataLayer,
-			packages: frontendPackages,
-		} = frontend;
-		const {
-			framework: backendFramework,
-			moduleType: backendModuleType,
-			dataLayer: backendDataLayer,
-			packages: backendPackages,
-			database,
-		} = backend;
+		const { framework, gqlClient, packages: frontPackages } = frontend;
+		const { environment, moduleType, gqlServer, packages: backPackages, database, cms } = backend;
 
 		const {
-			TSX,
-			GRAPHQL_CODEGEN_CLI,
-			GRAPHQL_CODEGEN_TYPESCRIPT,
-			GRAPHQL_CODEGEN_TYPESCRIPT_RESOLVERS,
-			NODEMON,
-			TSUP,
-			APOLLO_CLIENT,
-			GRAPHQL,
-			TYPESCRIPT,
-			TYPES_NODE,
-			MONGOOSE,
-			PG,
-			APOLLO_SERVER,
-			JWT_TYPE,
-			BCRYPT_TYPE,
-			CORS_TYPE,
-			NODEMON_TYPE,
+			GraphqlCodegenCli,
+			GraphqlCodegenTypescript,
+			GraphqlCodegenTypescriptResolvers,
+			ApolloClient,
+			ApolloServer,
+			Bcryptjs,
+			Cors,
+			Express,
+			Graphql,
+			GraphqlTag,
+			Jsonwebtoken,
+			Mongoose,
+			Nodemon,
+			Pg,
+			Tsup,
+			Tsx,
+			TypesBcryptjs,
+			TypesCors,
+			TypesExpress,
+			TypesJsonwebtoken,
+			TypesNode,
+			TypesNodemon,
+			TypesPg,
+			Typescript,
 		} = Packages;
+
+		const { Nextjs, Reactjs, Reactts } = FrontFrame;
+
+		const { Nodets, NodeExpressJs, NodeExpressTs } = BackendEnv;
+
+		const { Commonjs, Module } = ModuleType;
+
+		const { Mongodb, Postgres } = Database;
+
+		const { KeystoneJs, Strapi } = Cms;
 
 		const frontendCommands: string[] = [];
 		const backendCommands: string[] = [];
 
 		const kebabCaseTitle = title.toLowerCase().replace(/\s+/g, '-');
 
+		const frontendPackages = [...frontPackages];
+		const backendPackages = [...backPackages];
+
 		// Frontend framework specific commands
-		if (frontendFramework.includes('react-ts')) {
+		if (framework === Reactts) {
 			frontendCommands.push(`npm create vite@latest ${kebabCaseTitle} -- --template react-ts`);
 			frontendCommands.push(`cd ${kebabCaseTitle}`);
-			frontendPackages.push(TSX, TSUP, NODEMON);
-		} else if (frontendFramework.includes('next-js')) {
+			frontendPackages.push(Tsx, Tsup, Nodemon);
+		} else if (framework === Nextjs) {
 			frontendCommands.push(`npx create-next-app ${kebabCaseTitle}`);
 			frontendCommands.push(`cd ${kebabCaseTitle}`);
-		} else if (frontendFramework.includes('react-js')) {
+		} else if (framework === Reactjs) {
 			frontendCommands.push(`npm create vite@latest ${kebabCaseTitle} -- --template react`);
 			frontendCommands.push(`cd ${kebabCaseTitle}`);
-			frontendPackages.push(NODEMON);
+			frontendPackages.push(Nodemon);
 		}
 
 		// Frontend data layer specific commands
-		if (frontendDataLayer.includes('graphql-client')) {
-			frontendPackages.push(APOLLO_CLIENT, GRAPHQL);
+		if (gqlClient) {
+			frontendPackages.push(ApolloClient, Graphql, GraphqlTag);
 		}
 
-		// Backend framework specific commands
-		if (backendFramework.includes('node-ts')) {
-			backendCommands.push(`mkdir ${kebabCaseTitle}-backend`);
-			backendCommands.push(`cd ${kebabCaseTitle}-backend`);
-			backendCommands.push('npm init -y');
-			backendPackages.push(TYPESCRIPT, TYPES_NODE, TSX, TSUP);
+		// Backend setup commands
+		backendCommands.push(`mkdir ${kebabCaseTitle}-backend`);
+		backendCommands.push(`cd ${kebabCaseTitle}-backend`);
+		backendCommands.push('npm init -y');
+
+		if (environment === Nodets || environment === NodeExpressTs) {
+			backendPackages.push(Typescript, TypesNode, Tsx, Tsup);
 			for (const pkg of backendPackages) {
-				switch (pkg) {
-					case Packages.JWT:
-						backendPackages.push(JWT_TYPE);
+				switch (pkg as Packages) {
+					case Jsonwebtoken:
+						backendPackages.push(TypesJsonwebtoken);
 						break;
-					case Packages.BCRYPTJS:
-						backendPackages.push(BCRYPT_TYPE);
+					case Bcryptjs:
+						backendPackages.push(TypesBcryptjs);
 						break;
-					case Packages.CORS:
-						backendPackages.push(CORS_TYPE);
+					case Cors:
+						backendPackages.push(TypesCors);
 						break;
-					case Packages.NODEMON:
-						backendPackages.push(NODEMON_TYPE);
+					case Nodemon:
+						backendPackages.push(TypesNodemon);
 						break;
 					default:
 						break;
 				}
 			}
 		}
+		if (environment === NodeExpressTs) {
+			backendPackages.push(Express, TypesExpress);
+		}
+
+		if (environment === NodeExpressJs) {
+			backendPackages.push(Express);
+		}
 
 		// Backend data layer specific commands
-		if (backendDataLayer.includes('graphql-server')) {
+		if (gqlServer) {
 			backendPackages.push(
-				APOLLO_SERVER,
-				GRAPHQL,
-				GRAPHQL_CODEGEN_CLI,
-				GRAPHQL_CODEGEN_TYPESCRIPT,
-				GRAPHQL_CODEGEN_TYPESCRIPT_RESOLVERS
+				ApolloServer,
+				Graphql,
+				GraphqlTag,
+				GraphqlCodegenCli,
+				GraphqlCodegenTypescript,
+				GraphqlCodegenTypescriptResolvers
 			);
 		}
 
+		if (cms === KeystoneJs) {
+			backendCommands.push(`cd ${kebabCaseTitle}-backend`);
+			backendCommands.push('npm init keystone-app@latest');
+		} else if (cms === Strapi) {
+			backendCommands.push(`cd ${kebabCaseTitle}-backend`);
+			backendCommands.push(`npx create-strapi-app@latest ${kebabCaseTitle}`);
+		}
+
 		// Backend module type specific commands
-		if (backendModuleType.includes('module')) {
+		if (moduleType === Module) {
 			backendCommands.push('npm pkg set type="module"');
-		} else if (backendModuleType.includes('commonjs')) {
-			backendCommands.push(' npm pkg set type="commonjs"');
+		} else if (moduleType === Commonjs) {
+			backendCommands.push('npm pkg set type="commonjs"');
 		}
 
 		// Database specific commands
-		if (database.includes('mongodb')) {
-			backendCommands.push(MONGOOSE);
-		} else if (database.includes('postgres')) {
-			backendCommands.push(PG);
+		if (database === Mongodb) {
+			backendCommands.push(Mongoose);
+		} else if (database === Postgres) {
+			backendCommands.push(Pg);
+
+			if (environment === Nodets || environment === NodeExpressTs) {
+				backendPackages.push(TypesPg);
+			}
 		}
 		// Add more database specific commands as needed
 
@@ -130,9 +160,16 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 
 		const backendInstallCommands = backendCommands.concat(backendInstalls).join('\n');
 
+		// add frontend packages to the Mongo document
+		const uniqueFrontend = [...new Set([...project.frontend.packages, ...frontendPackages])];
+
+		const uniqueBackend = [...new Set([...project.backend.packages, ...backendPackages])];
+
 		project.installScripts.frontend = frontendInstallCommands;
 		project.installScripts.backend = backendInstallCommands;
-		await project.save();
+		project.frontend.packages = uniqueFrontend;
+		project.backend.packages = uniqueBackend;
+
 		return project;
 	} catch (error) {
 		console.error('Error generating npm install commands:', error.message);
