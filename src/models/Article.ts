@@ -1,4 +1,6 @@
 import mongoose, { Model, Document, Schema, model } from 'mongoose';
+import ProjectModel from './Project';
+import User from './User';
 
 interface ArticleDocument extends Document {
 	title: string;
@@ -31,7 +33,7 @@ const articleSchema = new Schema<ArticleDocument>(
 		},
 		linkedProjects: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Project',
+			ref: 'ProjectModel',
 		},
 	},
 	{

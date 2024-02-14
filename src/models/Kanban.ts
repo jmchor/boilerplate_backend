@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import mongoose, { Document, Model, Schema, model } from 'mongoose';
-import Project from './Project';
+import ProjectModel from './Project';
 import User from './User';
 
-interface KanbanDocument extends Document {
+export interface KanbanDocument extends Document {
 	backlog: string[];
 	todo: string[];
 	doing: string[];
@@ -31,7 +31,7 @@ const kanbanSchema = new Schema<KanbanDocument>({
 	},
 	project: {
 		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Project',
+		ref: 'ProjectModel',
 	},
 
 	createdBy: {
