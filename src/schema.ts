@@ -1,7 +1,67 @@
 import gql from 'graphql-tag';
+import { ModuleType, Database } from './types/backend';
 
 // test stuff
 const typeDefs = gql`
+	# enums
+
+	enum ModuleType {
+		commonjs
+		module
+	}
+
+	enum FrontFrame {
+		reactts
+		reactjs
+		vanillajs
+		nextjs
+	}
+
+	enum BackendEnv {
+		nodets
+		nodejs
+		nodeExpressTS
+		nodeExpressJS
+	}
+
+	enum Database {
+		mongodb
+		postgres
+	}
+
+	enum CMS {
+		keystoneJS
+		strapi
+	}
+
+	enum Packages {
+		jsonwebtoken
+		express
+		cors
+		bcryptjs
+		tsx
+		dotenv
+		GRAPHQL_CODEGEN_CLI
+		GRAPHQL_CODEGEN_TYPESCRIPT
+		GRAPHQL_CODEGEN_TYPESCRIPT_RESOLVERS
+		nodemon
+		tsup
+		apolloClient
+		graphql
+		typescript
+		typesNode
+		mongoose
+		pg
+		apolloServer
+		graphqlTag
+		typesJsonwebtoken
+		typesBcryptjs
+		typesCors
+		typesNodemon
+		typesPg
+		typesExpress
+	}
+
 	type Book {
 		title: String
 		author: String
@@ -13,6 +73,7 @@ const typeDefs = gql`
 		passwordHash: String!
 		projects: [Project]
 		articles: [Article]
+		_id: ID!
 	}
 
 	type Article {
@@ -22,6 +83,7 @@ const typeDefs = gql`
 		externalLink: String
 		linkedProjects: [Project]
 		createdBy: User
+		_id: ID!
 	}
 
 	type Kanban {
@@ -31,6 +93,7 @@ const typeDefs = gql`
 		done: [String]
 		project: Project!
 		createdBy: User!
+		_id: ID!
 	}
 
 	type Project {
@@ -42,21 +105,22 @@ const typeDefs = gql`
 		installScripts: InstallScripts
 		kanban: Kanban
 		articles: [Article]
+		_id: ID
 	}
 
 	type FrontendConfig {
-		framework: [String!]!
-		dataLayer: [String!]
-		packages: [String!]!
+		framework: FrontFrame
+		gqlClient: Boolean
+		packages: [Packages!]!
 	}
 
 	type BackendConfig {
-		framework: [String!]!
-		moduleType: [String!]!
-		dataLayer: [String!]
-		cms: [String!]
-		packages: [String!]!
-		database: [String!]!
+		environment: BackendEnv!
+		moduleType: ModuleType
+		gqlServer: Boolean
+		cms: CMS
+		packages: [Packages!]!
+		database: Database
 	}
 
 	type InstallScripts {
@@ -65,18 +129,18 @@ const typeDefs = gql`
 	}
 
 	input FrontendConfigInput {
-		framework: [String!]!
-		dataLayer: [String!]
-		packages: [String!]!
+		framework: FrontFrame
+		gqlClient: Boolean
+		packages: [Packages!]!
 	}
 
 	input BackendConfigInput {
-		framework: [String!]!
-		moduleType: [String!]!
-		dataLayer: [String!]
-		cms: [String!]
-		packages: [String!]!
-		database: [String!]!
+		environment: BackendEnv!
+		moduleType: ModuleType
+		gqlServer: Boolean
+		cms: CMS
+		packages: [Packages!]!
+		database: Database
 	}
 
 	input InstallScriptsInput {
@@ -116,6 +180,7 @@ const typeDefs = gql`
 			kanban: KanbanInput
 			articles: [ArticleInput]
 		): Project
+		addInstallScript(_id: ID!): Project
 	}
 `;
 
