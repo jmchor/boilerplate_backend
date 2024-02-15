@@ -98,7 +98,7 @@ const typeDefs = gql`
 	type Project {
 		title: String!
 		description: String
-		createdBy: ID!
+		createdBy: User!
 		frontend: FrontendConfig!
 		backend: BackendConfig!
 		installScripts: InstallScripts
