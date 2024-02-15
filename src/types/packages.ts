@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 // export enum Packages {
 // 	GraphqlCodegenCli = '@graphql-codegen/cli',
 // 	GraphqlCodegenTypescript = '@graphql-codegen/typescript',

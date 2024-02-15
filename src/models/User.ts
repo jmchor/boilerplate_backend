@@ -1,22 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import mongoose, { Schema, model, Document, Model } from 'mongoose';
-import ProjectModel from './Project';
-import Article from './Article';
+import ProjectModel from './Project.js';
+import Article from './Article.js';
+import { User, Project } from '../types.js';
 
-interface Articles {
-	authored: (mongoose.Types.ObjectId | string | null)[];
-	liked: (mongoose.Types.ObjectId | string | null)[];
-}
+// interface Articles {
+// 	authored: (mongoose.Types.ObjectId | string | null)[];
+// 	liked: (mongoose.Types.ObjectId | string | null)[];
+// }
 
-export interface UserDocument extends Document {
-	username: string;
-	email: string;
-	passwordHash: string;
-	projects?: (mongoose.Types.ObjectId | string | null)[];
-	articles?: Articles[];
-}
+// export interface UserDocument extends Document {
+// 	username: string;
+// 	email: string;
+// 	passwordHash: string;
+// 	projects?: (mongoose.Types.ObjectId | string | null)[];
+// 	articles?: Articles[];
+// }
 
-const userSchema = new Schema<UserDocument>(
+const userSchema = new Schema<User>(
 	{
 		username: {
 			type: String,
@@ -31,10 +32,12 @@ const userSchema = new Schema<UserDocument>(
 			required: true,
 		},
 
-		projects: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'ProjectModel',
-		},
+		projects: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'ProjectModel',
+			},
+		],
 		articles: {
 			authored: [
 				{
@@ -57,6 +60,6 @@ const userSchema = new Schema<UserDocument>(
 	}
 );
 
-const User: Model<UserDocument> = model<UserDocument>('User', userSchema);
+const User: Model<User> = model<User>('User', userSchema);
 
 export default User;

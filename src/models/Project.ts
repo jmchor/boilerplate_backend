@@ -1,29 +1,29 @@
 import mongoose, { Document, Schema, model, Model } from 'mongoose';
 
-import { FrontendConfig, BackendConfig } from '../types';
+import { FrontendConfig, BackendConfig, Project } from '../types.js';
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import User from './User';
-import Article from './Article';
+import User from './User.js';
+import Article from './Article.js';
 
-// Define interface for Project document
-export interface ProjectDocument extends Document {
-	_id?: mongoose.Types.ObjectId;
-	title: string;
-	description?: string;
-	createdBy: string | mongoose.Types.ObjectId;
+// // Define interface for Project document
+// export interface ProjectDocument extends Document {
+// 	_id?: mongoose.Types.ObjectId;
+// 	title: string;
+// 	description?: string;
+// 	createdBy: mongoose.Types.ObjectId;
 
-	frontend: FrontendConfig;
-	backend: BackendConfig;
-	installScripts?: {
-		frontend?: string;
-		backend?: string;
-	};
-	kanban?: mongoose.Types.ObjectId | string | null; // Reference to Kanban model
-	articles?: (mongoose.Types.ObjectId | string)[]; // Array of references to Article model
-}
+// 	frontend: FrontendConfig;
+// 	backend: BackendConfig;
+// 	installScripts?: {
+// 		frontend?: string;
+// 		backend?: string;
+// 	};
+// 	kanban?: mongoose.Types.ObjectId | string | null; // Reference to Kanban model
+// 	articles?: (mongoose.Types.ObjectId | string)[]; // Array of references to Article model
+// }
 
 // Define mongoose schema for Project
-const projectSchema = new Schema<ProjectDocument>(
+const projectSchema = new Schema<Project>(
 	{
 		title: {
 			type: String,
@@ -129,7 +129,6 @@ const projectSchema = new Schema<ProjectDocument>(
 		kanban: {
 			type: Schema.Types.ObjectId,
 			ref: 'Kanban',
-			default: '',
 		},
 		articles: [
 			{
@@ -155,6 +154,6 @@ const projectSchema = new Schema<ProjectDocument>(
 );
 
 // Define mongoose model for Project
-const ProjectModel: Model<ProjectDocument> = model<ProjectDocument>('ProjectModel', projectSchema);
+const ProjectModel: Model<Project> = model<Project>('ProjectModel', projectSchema);
 
 export default ProjectModel;

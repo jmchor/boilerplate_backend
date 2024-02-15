@@ -1,18 +1,18 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import mongoose, { Document, Model, Schema, model } from 'mongoose';
-import ProjectModel from './Project';
-import User from './User';
+import mongoose, { Model, Schema, model } from 'mongoose';
+import ProjectModel from './Project.js';
+import User from './User.js';
+import { Kanban } from '../types.js';
 
-export interface KanbanDocument extends Document {
-	backlog: string[];
-	todo: string[];
-	doing: string[];
-	done: string[];
-	project: mongoose.Types.ObjectId | string | null;
-	createdBy: mongoose.Types.ObjectId | string | null;
-}
+// export interface KanbanDocument extends Document {
+// 	backlog: string[];
+// 	todo: string[];
+// 	doing: string[];
+// 	done: string[];
+// 	project: mongoose.Types.ObjectId | string | null;
+// 	createdBy: mongoose.Types.ObjectId | string | null;
+// }
 
-const kanbanSchema = new Schema<KanbanDocument>({
+const kanbanSchema = new Schema<Kanban>({
 	backlog: {
 		type: [String],
 		default: [],
@@ -40,6 +40,6 @@ const kanbanSchema = new Schema<KanbanDocument>({
 	},
 });
 
-const Kanban: Model<KanbanDocument> = model<KanbanDocument>('Kanban', kanbanSchema);
+const Kanban: Model<Kanban> = model<Kanban>('Kanban', kanbanSchema);
 
 export default Kanban;

@@ -1,17 +1,18 @@
-import mongoose, { Model, Document, Schema, model } from 'mongoose';
-import ProjectModel from './Project';
-import User from './User';
+import mongoose, { Model, Schema, model } from 'mongoose';
+import ProjectModel from './Project.js';
+import User from './User.js';
+import { Article } from '../types.js';
 
-interface ArticleDocument extends Document {
-	title: string;
-	text: string;
-	imageUrl?: string;
-	externalLink?: string;
-	linkedProjects?: (mongoose.Types.ObjectId | string)[];
-	createdBy: mongoose.Types.ObjectId | string;
-}
+// export interface ArticleDocument extends Document {
+// 	title: string;
+// 	text: string;
+// 	imageUrl?: string;
+// 	externalLink?: string;
+// 	linkedProjects?: (mongoose.Types.ObjectId | string)[];
+// 	createdBy: mongoose.Types.ObjectId | string;
+// }
 
-const articleSchema = new Schema<ArticleDocument>(
+const articleSchema = new Schema<Article>(
 	{
 		imageUrl: {
 			type: String,
@@ -31,16 +32,18 @@ const articleSchema = new Schema<ArticleDocument>(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'User',
 		},
-		linkedProjects: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'ProjectModel',
-		},
+		linkedProjects: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'ProjectModel',
+			},
+		],
 	},
 	{
 		timestamps: true,
 	}
 );
 
-const Article: Model<ArticleDocument> = model<ArticleDocument>('Article', articleSchema);
+const Article: Model<Article> = model<Article>('Article', articleSchema);
 
 export default Article;
