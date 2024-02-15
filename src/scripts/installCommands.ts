@@ -1,13 +1,14 @@
-import ProjectModel, { ProjectDocument } from '../models/Project.js';
+import ProjectModel from '../models/Project.js';
 
-import { ModuleType, FrontFrame, BackendEnv, Cms, Database, Packages } from '../types.js';
+import { ModuleType, FrontFrame, BackendEnv, Cms, Database, Project, Packages } from '../types.js';
+// import { Packages } from '../types/packages.js';
 
 // Function to generate the npm install commands
-export const generateInstallCommands = async (projectId: string): Promise<ProjectDocument> => {
+export const generateInstallCommands = async (projectId: string): Promise<Project> => {
 	try {
 		// Fetch project data from the database
 
-		const project = await ProjectModel.findById(projectId);
+		const project: Project = await ProjectModel.findById(projectId);
 
 		const { frontend, backend, title } = project;
 		const { framework, gqlClient, packages: frontPackages } = frontend;
