@@ -1,25 +1,25 @@
 import { GraphQLError } from 'graphql';
-import { Project, Resolvers } from './types';
+import { Project, Resolvers } from './types.js';
 // // This is resolvers.ts
 // import jwt from 'jsonwebtoken';
 
-import ProjectModel from './models/Project';
-import { generateInstallCommands } from './scripts/installCommands';
+import ProjectModel from './models/Project.js';
+import { generateInstallCommands } from './scripts/installCommands.js';
 
-// testresolvers
-const books = [
-	{
-		title: 'The Awakening',
-		author: 'Kate Chopin',
-	},
-	{
-		title: 'City of Glass',
-		author: 'Paul Auster',
-	},
-];
+// // testresolvers
+// const books = [
+// 	{
+// 		title: 'The Awakening',
+// 		author: 'Kate Chopin',
+// 	},
+// 	{
+// 		title: 'City of Glass',
+// 		author: 'Paul Auster',
+// 	},
+// ];
 const resolvers: Resolvers = {
 	Query: {
-		books: () => books,
+		// books: () => books,
 	},
 
 	Mutation: {
@@ -45,9 +45,9 @@ const resolvers: Resolvers = {
 					},
 				};
 
-				await new ProjectModel(newProjectData).save();
-
-				return newProjectData;
+				const newProject = new ProjectModel(newProjectData);
+				await newProject.save();
+				return newProject;
 			} catch (error: unknown) {
 				throw new GraphQLError(`Failed to create project:`, {
 					extensions: {
@@ -59,7 +59,9 @@ const resolvers: Resolvers = {
 			}
 		},
 		addInstallScript: async (root, args: { _id: string }): Promise<Project> => {
+			console.log('HERE WE ARE!', args);
 			try {
+				// Check if _id is valid (you might want to add more validation here)
 				if (!args) {
 					throw new Error('Invalid project ID');
 				}
@@ -81,16 +83,17 @@ const resolvers: Resolvers = {
 					{ new: true }
 				);
 
-				const mutationReturn: Project = {
-					backend: updatedProject?.backend,
-					createdBy: updatedProject?.createdBy as string,
-					description: updatedProject?.description,
-					frontend: updatedProject?.frontend,
-					installScripts: updatedProject?.installScripts,
-					title: updatedProject?.title,
-				};
+				// const returnableProject: Project = {
+				// 	backend: updatedProject?.backend,
+				// 	createdBy: updatedProject?.createdBy,
+				// 	description: updatedProject?.description,
+				// 	frontend: updatedProject?.frontend,
+				// 	kanban: updatedProject?.kanban,
+				// 	installScripts: updatedProject?.installScripts,
+				// 	title: updatedProject?.title,
+				// };
 
-				return mutationReturn;
+				return updatedProject;
 			} catch (error) {
 				console.error('Error adding install script:', error.message);
 				throw error;
