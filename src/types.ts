@@ -157,30 +157,30 @@ export type MutationCreateProjectArgs = {
 };
 
 export enum Packages {
-	GraphqlCodegenCli = '@graphql-codegen/cli',
-	GraphqlCodegenTypescript = '@graphql-codegen/typescript',
-	GraphqlCodegenTypescriptResolvers = '@graphql-codegen/typescript-resolvers',
-	ApolloClient = '@apollo/client',
-	ApolloServer = '@apollo/server',
+	GraphqlCodegenCli = 'GRAPHQL_CODEGEN_CLI',
+	GraphqlCodegenTypescript = 'GRAPHQL_CODEGEN_TYPESCRIPT',
+	GraphqlCodegenTypescriptResolvers = 'GRAPHQL_CODEGEN_TYPESCRIPT_RESOLVERS',
+	ApolloClient = 'apolloClient',
+	ApolloServer = 'apolloServer',
 	Bcryptjs = 'bcryptjs',
 	Cors = 'cors',
 	Dotenv = 'dotenv',
 	Express = 'express',
 	Graphql = 'graphql',
-	GraphqlTag = 'graphql-tag',
+	GraphqlTag = 'graphqlTag',
 	Jsonwebtoken = 'jsonwebtoken',
 	Mongoose = 'mongoose',
 	Nodemon = 'nodemon',
 	Pg = 'pg',
 	Tsup = 'tsup',
 	Tsx = 'tsx',
-	TypesBcryptjs = '@types/bcryptjs',
-	TypesCors = '@types/cors',
-	TypesExpress = '@types/express',
-	TypesJsonwebtoken = '@types/jsonwebtoken',
-	TypesNode = '@types/node',
-	TypesNodemon = '@types/nodemon',
-	TypesPg = '@types/pg',
+	TypesBcryptjs = 'typesBcryptjs',
+	TypesCors = 'typesCors',
+	TypesExpress = 'typesExpress',
+	TypesJsonwebtoken = 'typesJsonwebtoken',
+	TypesNode = 'typesNode',
+	TypesNodemon = 'typesNodemon',
+	TypesPg = 'typesPg',
 	Typescript = 'typescript',
 }
 
@@ -189,7 +189,7 @@ export type Project = {
 	_id?: Maybe<Scalars['ID']['output']>;
 	articles?: Maybe<Array<Maybe<Article>>>;
 	backend: BackendConfig;
-	createdBy: Scalars['ID']['output'];
+	createdBy: User;
 	description?: Maybe<Scalars['String']['output']>;
 	frontend: FrontendConfig;
 	installScripts?: Maybe<InstallScripts>;
@@ -426,7 +426,7 @@ export type ProjectResolvers<
 	_id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
 	articles?: Resolver<Maybe<Array<Maybe<ResolversTypes['Article']>>>, ParentType, ContextType>;
 	backend?: Resolver<ResolversTypes['BackendConfig'], ParentType, ContextType>;
-	createdBy?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+	createdBy?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
 	description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 	frontend?: Resolver<ResolversTypes['FrontendConfig'], ParentType, ContextType>;
 	installScripts?: Resolver<Maybe<ResolversTypes['InstallScripts']>, ParentType, ContextType>;
