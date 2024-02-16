@@ -29,6 +29,25 @@ const resolvers: Resolvers = {
 
 			return populatedProjects;
 		},
+
+		findProject: async (parent, { _id }): Promise<Project> => {
+			const project = await ProjectModel.findById(_id);
+
+			if (!project) {
+				throw new GraphQLError('Project not found', {
+					extensions: {
+						code: 'NOT_FOUND',
+						invalidArgs: _id,
+					},
+				});
+			}
+			console.log(project);
+
+			return project.populate({
+				path: 'createdBy',
+				model: UserModel,
+			});
+		},
 		allArticles: async (): Promise<Article[]> => {
 			const articles = await ArticleModel.find();
 
@@ -46,6 +65,23 @@ const resolvers: Resolvers = {
 			);
 
 			return populatedArticles;
+		},
+		findArticle: async (parent, { _id }): Promise<Article> => {
+			const article = await ArticleModel.findById(_id);
+
+			if (!article) {
+				throw new GraphQLError('Article not found', {
+					extensions: {
+						code: 'NOT_FOUND',
+						invalidArgs: _id,
+					},
+				});
+			}
+
+			return article.populate({
+				path: 'createdBy',
+				model: UserModel,
+			});
 		},
 	},
 
