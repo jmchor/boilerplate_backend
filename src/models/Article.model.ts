@@ -1,6 +1,6 @@
 import mongoose, { Model, Schema, model } from 'mongoose';
-import ProjectModel from './Project.js';
-import User from './User.js';
+import { ProjectModel } from './Project.model.js';
+import { UserModel } from './User.model.js';
 import { Article } from '../types.js';
 
 // export interface ArticleDocument extends Document {
@@ -30,7 +30,7 @@ const articleSchema = new Schema<Article>(
 		},
 		createdBy: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'User',
+			ref: 'UserModel',
 		},
 		linkedProjects: [
 			{
@@ -44,6 +44,4 @@ const articleSchema = new Schema<Article>(
 	}
 );
 
-const Article: Model<Article> = model<Article>('Article', articleSchema);
-
-export default Article;
+export const ArticleModel: Model<Article> = model<Article>('ArticleModel', articleSchema);

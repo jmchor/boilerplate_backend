@@ -1,16 +1,17 @@
 import mongoose, { Document, Schema, model, Model } from 'mongoose';
+import { KanbanModel } from './Kanban.model.js';
 
 import { FrontendConfig, BackendConfig, Project } from '../types.js';
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import User from './User.js';
-import Article from './Article.js';
+import { UserModel } from './User.model.js';
+import { ArticleModel } from './Article.model.js';
 
 // // Define interface for Project document
 // export interface ProjectDocument extends Document {
 // 	_id?: mongoose.Types.ObjectId;
 // 	title: string;
 // 	description?: string;
-// 	createdBy: mongoose.Types.ObjectId;
+// 	createdBy: string | mongoose.Types.ObjectId;
 
 // 	frontend: FrontendConfig;
 // 	backend: BackendConfig;
@@ -34,7 +35,7 @@ const projectSchema = new Schema<Project>(
 		},
 		createdBy: {
 			type: Schema.Types.ObjectId,
-			ref: 'User',
+			ref: 'UserModel',
 		},
 
 		frontend: {
@@ -128,12 +129,13 @@ const projectSchema = new Schema<Project>(
 		},
 		kanban: {
 			type: Schema.Types.ObjectId,
-			ref: 'Kanban',
+			ref: 'KanbanModel',
 		},
+
 		articles: [
 			{
 				type: Schema.Types.ObjectId,
-				ref: 'Articles',
+				ref: 'ArticleModel',
 			},
 		],
 
@@ -154,6 +156,4 @@ const projectSchema = new Schema<Project>(
 );
 
 // Define mongoose model for Project
-const ProjectModel: Model<Project> = model<Project>('ProjectModel', projectSchema);
-
-export default ProjectModel;
+export const ProjectModel: Model<Project> = model<Project>('ProjectModel', projectSchema);

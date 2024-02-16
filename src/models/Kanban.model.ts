@@ -1,6 +1,6 @@
 import mongoose, { Model, Schema, model } from 'mongoose';
-import ProjectModel from './Project.js';
-import User from './User.js';
+import { ProjectModel } from './Project.model.js';
+import { UserModel } from './User.model.js';
 import { Kanban } from '../types.js';
 
 // export interface KanbanDocument extends Document {
@@ -36,10 +36,8 @@ const kanbanSchema = new Schema<Kanban>({
 
 	createdBy: {
 		type: mongoose.Schema.Types.ObjectId,
-		ref: 'User',
+		ref: 'UserModel',
 	},
 });
 
-const Kanban: Model<Kanban> = model<Kanban>('Kanban', kanbanSchema);
-
-export default Kanban;
+export const KanbanModel: Model<Kanban> = model<Kanban>('KanbanModel', kanbanSchema);
