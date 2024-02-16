@@ -162,7 +162,7 @@ const typeDefs = gql`
 	}
 
 	type Query {
-		allProjects: [Project!]
+		allProjects: [Project]
 		findProject(_id: ID, title: String): Project
 
 		allArticles: [Article]
