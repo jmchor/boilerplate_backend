@@ -2,19 +2,13 @@
 // This is index.ts
 import { ApolloServer, BaseContext } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
-import { MongoClient } from 'mongodb';
-import dotenv from 'dotenv';
+
+import { connectToMongoDB } from './db.js';
 
 import resolvers from './resolvers.js';
 import typeDefs from './schema.js';
 
-dotenv.config();
-const { MONGODB_URI } = process.env;
-
 async function startApolloServer() {
-	const client = new MongoClient(MONGODB_URI);
-	await client.connect();
-
 	const server: ApolloServer<BaseContext> = new ApolloServer({
 		typeDefs,
 		resolvers,
@@ -46,3 +40,4 @@ async function startApolloServer() {
 }
 
 await startApolloServer();
+await connectToMongoDB();
