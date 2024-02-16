@@ -5,13 +5,13 @@
 		"plugin:@typescript-eslint/recommended",
 		"plugin:@typescript-eslint/recommended-requiring-type-checking",
 		"wesbos",
-		"plugin:prettier/recommended"
+		"plugin:prettier/recommended",
 	],
 	"plugins": ["@typescript-eslint"],
 	"env": {
 		"browser": true,
 		"es6": true,
-		"node": true
+		"node": true,
 	},
 	"overrides": [
 		{
@@ -21,17 +21,17 @@
 				"eslint:recommended",
 				"plugin:@typescript-eslint/recommended",
 				"plugin:@typescript-eslint/recommended-requiring-type-checking",
-				"plugin:prettier/recommended"
+				"plugin:prettier/recommended",
 			],
 			"parserOptions": {
 				"project": ["./tsconfig.json"], // Specify it only for TypeScript files
 				"ecmaVersion": "latest",
-				"sourceType": "module"
+				"sourceType": "module",
 			},
 			"settings": {
 				"import/resolver": {
-					"typescript": {}
-				}
+					"typescript": {},
+				},
 			},
 			"rules": {
 				"@typescript-eslint/semi": ["error"],
@@ -44,8 +44,9 @@
 				"no-case-declarations": "off",
 				"no-console": 0,
 				"comma-dangle": "off",
-				"no-void": ["error", { "allowAsStatement": true }]
-			}
-		}
-	]
+				"no-void": ["error", { "allowAsStatement": true }],
+				"no-shadow": "off",
+			},
+		},
+	],
 }
