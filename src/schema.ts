@@ -165,7 +165,7 @@ const typeDefs = gql`
 		allProjects: [Project!]
 		findProject(_id: ID, title: String): Project
 
-		allArticles: [Article!]
+		allArticles: [Article]
 	}
 
 	type Mutation {

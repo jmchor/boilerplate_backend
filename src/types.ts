@@ -192,7 +192,7 @@ export enum Packages {
 	ApolloClient = '@apollo/client',
 	ApolloServer = '@apollo/server',
 	Bcryptjs = 'bcryptjs',
-	Bcryptts = 'bcrypt-ts',
+	Bryptts = 'bcrypt-ts',
 	Cors = 'cors',
 	Dotenv = 'dotenv',
 	Express = 'express',
@@ -229,7 +229,7 @@ export type Project = {
 
 export type Query = {
 	__typename?: 'Query';
-	allArticles?: Maybe<Array<Article>>;
+	allArticles?: Maybe<Array<Maybe<Article>>>;
 	allProjects?: Maybe<Array<Project>>;
 	findProject?: Maybe<Project>;
 };
@@ -495,7 +495,7 @@ export type QueryResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query'],
 > = {
-	allArticles?: Resolver<Maybe<Array<ResolversTypes['Article']>>, ParentType, ContextType>;
+	allArticles?: Resolver<Maybe<Array<Maybe<ResolversTypes['Article']>>>, ParentType, ContextType>;
 	allProjects?: Resolver<Maybe<Array<ResolversTypes['Project']>>, ParentType, ContextType>;
 	findProject?: Resolver<
 		Maybe<ResolversTypes['Project']>,

@@ -10,7 +10,22 @@ import { ArticleModel } from './models/Article.model.js';
 import { UserModel } from './models/User.model.js';
 
 const resolvers: Resolvers = {
-	Query: {},
+	Query: {
+		allArticles: async (): Promise<Article[]> => {
+			const articles = await ArticleModel.find();
+
+			const populatedArticles = await Promise.all(
+				articles.map(async (article) => {
+					return article.populate({
+						path: 'createdBy',
+						model: UserModel,
+					});
+				})
+			);
+
+			return populatedArticles;
+		},
+	},
 
 	Mutation: {
 		createProject: async (
