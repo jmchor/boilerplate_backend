@@ -38,6 +38,7 @@ const typeDefs = gql`
 		express
 		cors
 		bcryptjs
+		bcryptts
 		tsx
 		dotenv
 		GRAPHQL_CODEGEN_CLI
@@ -61,18 +62,13 @@ const typeDefs = gql`
 		typesExpress
 	}
 
-	type Book {
-		title: String
-		author: String
-	}
-
 	type User {
 		username: String!
 		email: String!
 		passwordHash: String!
 		projects: [Project]
 		articles: [Article]
-		_id: ID!
+		_id: ID
 	}
 
 	type Article {
@@ -81,8 +77,8 @@ const typeDefs = gql`
 		imageUrl: String
 		externalLink: String
 		linkedProjects: [Project]
-		createdBy: User
-		_id: ID!
+		createdBy: User!
+		_id: ID
 	}
 
 	type Kanban {
@@ -151,6 +147,7 @@ const typeDefs = gql`
 		text: String!
 		imageUrl: String
 		externalLink: String
+		linkedProjects: [ID]
 		createdBy: ID
 		# Any other fields from Article that are required for creating a new article
 	}
@@ -165,10 +162,14 @@ const typeDefs = gql`
 	}
 
 	type Query {
-		books: [Book]
+		allProjects: [Project!]
+		findProject(_id: ID, title: String): Project
+
+		allArticles: [Article!]
 	}
 
 	type Mutation {
+		##Project CRUD
 		createProject(
 			title: String!
 			description: String
@@ -180,6 +181,28 @@ const typeDefs = gql`
 			articles: [ArticleInput]
 		): Project
 		addInstallScript(_id: ID!): Project
+
+		editProject(
+			_id: ID!
+			title: String
+			description: String
+			frontend: FrontendConfigInput
+			backend: BackendConfigInput
+		): Project
+
+		deleteProject(_id: ID!): Project
+
+		deleteArticle(_id: ID!): Article
+
+		createArticle(
+			title: String!
+			text: String!
+			imageUrl: String
+			externalLink: String
+			createdBy: ID!
+		): Article
+
+		createUser(username: String!, email: String!, password: String!): User
 	}
 `;
 
