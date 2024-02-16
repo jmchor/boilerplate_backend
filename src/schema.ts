@@ -184,13 +184,7 @@ const typeDefs = gql`
 		): Project
 		addInstallScript(_id: ID!): Project
 
-		editProject(
-			_id: ID!
-			title: String
-			description: String
-			frontend: FrontendConfigInput
-			backend: BackendConfigInput
-		): Project
+		editProject(_id: ID!, title: String, description: String): Project
 
 		deleteProject(_id: ID!): Project
 

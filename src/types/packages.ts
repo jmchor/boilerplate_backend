@@ -6,7 +6,7 @@ export enum Packages {
 	ApolloClient = '@apollo/client',
 	ApolloServer = '@apollo/server',
 	Bcryptjs = 'bcryptjs',
-	Bryptts = 'bcrypt-ts',
+	Bcryptts = 'bcrypt-ts',
 	Cors = 'cors',
 	Dotenv = 'dotenv',
 	Express = 'express',

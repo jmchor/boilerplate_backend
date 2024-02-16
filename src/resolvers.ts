@@ -174,7 +174,7 @@ const resolvers: Resolvers = {
 			}
 		},
 
-		editProject: async (parent, { _id, title, description, frontend, backend }): Promise<Project> => {
+		editProject: async (parent, { _id, title, description }): Promise<Project> => {
 			try {
 				// Check if _id is valid (you might want to add more validation here)
 				if (!_id) {
@@ -186,22 +186,16 @@ const resolvers: Resolvers = {
 					});
 				}
 
-				const updatedProject = await ProjectModel.findByIdAndUpdate(
+				const projectToUpdate = await ProjectModel.findByIdAndUpdate(
 					_id,
 					{
 						title,
 						description,
-						frontend: {
-							...frontend,
-						},
-						backend: {
-							...backend,
-						},
 					},
 					{ new: true }
 				);
 
-				return updatedProject;
+				return projectToUpdate;
 			} catch (error) {
 				throw new GraphQLError('Failed to edit project', {
 					extensions: {
