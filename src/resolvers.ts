@@ -138,6 +138,44 @@ const resolvers: Resolvers = {
 			}
 		},
 
+		editProject: async (parent, { _id, title, description, frontend, backend }): Promise<Project> => {
+			try {
+				// Check if _id is valid (you might want to add more validation here)
+				if (!_id) {
+					throw new GraphQLError('Invalid project ID', {
+						extensions: {
+							code: 'INVALID_INPUT',
+							invalidArgs: _id,
+						},
+					});
+				}
+
+				const updatedProject = await ProjectModel.findByIdAndUpdate(
+					_id,
+					{
+						title,
+						description,
+						frontend: {
+							...frontend,
+						},
+						backend: {
+							...backend,
+						},
+					},
+					{ new: true }
+				);
+
+				return updatedProject;
+			} catch (error) {
+				throw new GraphQLError('Failed to edit project', {
+					extensions: {
+						code: 'INVALID_INPUT',
+						invalidArgs: _id,
+					},
+				});
+			}
+		},
+
 		createArticle: async (parent, { title, text, imageUrl, externalLink, createdBy }): Promise<Article> => {
 			try {
 				console.log('Checking if article already exists...');
