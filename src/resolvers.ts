@@ -11,8 +11,30 @@ import { UserModel } from './models/User.model.js';
 
 const resolvers: Resolvers = {
 	Query: {
+		allProjects: async (): Promise<Project[]> => {
+			const projects = await ProjectModel.find();
+
+			if (!projects) {
+				throw new GraphQLError('No projects found');
+			}
+
+			const populatedProjects = await Promise.all(
+				projects.map(async (project) => {
+					return project.populate({
+						path: 'createdBy',
+						model: UserModel,
+					});
+				})
+			);
+
+			return populatedProjects;
+		},
 		allArticles: async (): Promise<Article[]> => {
 			const articles = await ArticleModel.find();
+
+			if (!articles) {
+				throw new GraphQLError('No articles found');
+			}
 
 			const populatedArticles = await Promise.all(
 				articles.map(async (article) => {
