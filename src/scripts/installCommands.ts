@@ -1,4 +1,5 @@
-import ProjectModel from '../models/Project.js';
+import { GraphQLError } from 'graphql';
+import { ProjectModel } from '../models/Project.model.js';
 
 import { ModuleType, FrontFrame, BackendEnv, Cms, Database, Project, Packages } from '../types.js';
 // import { Packages } from '../types/packages.js';
@@ -7,6 +8,15 @@ import { ModuleType, FrontFrame, BackendEnv, Cms, Database, Project, Packages } 
 export const generateInstallCommands = async (projectId: string): Promise<Project> => {
 	try {
 		// Fetch project data from the database
+
+		if (!projectId) {
+			throw new GraphQLError('Invalid project ID', {
+				extensions: {
+					code: 'INVALID_INPUT',
+					invalidArgs: projectId,
+				},
+			});
+		}
 
 		const project: Project = await ProjectModel.findById(projectId);
 
@@ -21,6 +31,7 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 			ApolloClient,
 			ApolloServer,
 			Bcryptjs,
+			Bcryptts,
 			Cors,
 			Express,
 			Graphql,
@@ -31,7 +42,6 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 			Pg,
 			Tsup,
 			Tsx,
-			TypesBcryptjs,
 			TypesCors,
 			TypesExpress,
 			TypesJsonwebtoken,
@@ -91,7 +101,7 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 						backendPackages.push(TypesJsonwebtoken);
 						break;
 					case Bcryptjs:
-						backendPackages.push(TypesBcryptjs);
+						backendPackages.push(Bcryptts);
 						break;
 					case Cors:
 						backendPackages.push(TypesCors);
@@ -141,15 +151,14 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 
 		// Database specific commands
 		if (database === Mongodb) {
-			backendCommands.push(Mongoose);
+			backendPackages.push(Mongoose);
 		} else if (database === Postgres) {
-			backendCommands.push(Pg);
+			backendPackages.push(Pg);
 
 			if (environment === Nodets || environment === NodeExpressTs) {
 				backendPackages.push(TypesPg);
 			}
 		}
-		// Add more database specific commands as needed
 
 		// Construct npm install commands
 		const frontendInstalls = `npm install ${frontendPackages.join(' ')}`;
@@ -165,6 +174,15 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 		const uniqueFrontend = [...new Set([...project.frontend.packages, ...frontendPackages])];
 
 		const uniqueBackend = [...new Set([...project.backend.packages, ...backendPackages])];
+
+		if (uniqueBackend.includes(Bcryptts)) {
+			// If Bcryptts is present in backPackages
+			const index = uniqueBackend.indexOf(Bcryptjs);
+			if (index !== -1) {
+				// If Bcryptjs is present in backPackages, remove it
+				uniqueBackend.splice(index, 1);
+			}
+		}
 
 		project.installScripts.frontend = frontendInstallCommands;
 		project.installScripts.backend = backendInstallCommands;
