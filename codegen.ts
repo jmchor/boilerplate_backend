@@ -5,6 +5,11 @@ const config: CodegenConfig = {
 	generates: {
 		'./src/types.ts': {
 			plugins: ['typescript', 'typescript-resolvers'],
+			config: {
+				enumValues: {
+					Packages: './types/packages#Packages',
+				},
+			},
 		},
 	},
 };
