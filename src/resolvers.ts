@@ -4,10 +4,11 @@ import { Article, Project, Resolvers, User } from './types.js';
 
 // import jwt from 'jsonwebtoken';
 
-import { ProjectModel } from './models/Project.model.js';
 import { generateInstallCommands } from './scripts/installCommands.js';
+import { ProjectModel } from './models/Project.model.js';
 import { ArticleModel } from './models/Article.model.js';
 import { UserModel } from './models/User.model.js';
+import { KanbanModel } from './models/Kanban.model.js';
 
 const resolvers: Resolvers = {
 	Query: {
@@ -110,15 +111,60 @@ const resolvers: Resolvers = {
 				};
 
 				const newProject = new ProjectModel(newProjectData);
+
 				await newProject.save();
 
-				console.log(newProject);
+				const projectToUpdate = await generateInstallCommands(newProject._id);
+				const {
+					installScripts,
+					frontend: { packages: frontendPackages },
+					backend: { packages: backendPackages },
+				} = projectToUpdate;
 
-				const populatedProject = await ProjectModel.findById(newProject._id).populate({
-					path: 'createdBy',
-					model: UserModel,
+				const updatedProject = await ProjectModel.findByIdAndUpdate(
+					newProject._id,
+					{
+						$set: {
+							'frontend.packages': frontendPackages,
+							'backend.packages': backendPackages,
+							installScripts,
+						},
+					},
+					{ new: true }
+				);
+
+				// create a new Kanban
+
+				const newKanban = new KanbanModel({
+					project: updatedProject._id,
+					backlog: [],
+					todo: [],
+					doing: [],
+					done: [],
 				});
-				console.log(populatedProject);
+
+				await newKanban.save();
+
+				// associate the new Kanban with the new project
+
+				const addKanbanToProject = await ProjectModel.findByIdAndUpdate(
+					updatedProject._id,
+					{
+						kanban: newKanban._id,
+					},
+					{ new: true }
+				);
+
+				const populatedProject = await ProjectModel.findById(updatedProject._id)
+					.populate({
+						path: 'createdBy',
+						model: UserModel,
+					})
+					.populate({
+						path: 'kanban',
+						model: KanbanModel,
+					});
+
 				return populatedProject;
 			} catch (error: unknown) {
 				throw new GraphQLError(`Failed to create project:`, {
@@ -283,7 +329,7 @@ const resolvers: Resolvers = {
 				}
 
 				const passwordRegex =
-					/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?\-]).{6,}/;
+					/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?-]).{6,}/;
 				if (!passwordRegex.test(password)) {
 					throw new GraphQLError(
 						'Password must be at least 6 characters long, and must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
