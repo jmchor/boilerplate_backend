@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema, model, Model } from 'mongoose';
+import mongoose, { Schema, model, Model } from 'mongoose';
 import { KanbanModel } from './Kanban.model.js';
 
 import { FrontendConfig, BackendConfig, Project } from '../types.js';
