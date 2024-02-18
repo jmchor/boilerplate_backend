@@ -1,7 +1,7 @@
 import { GraphQLError } from 'graphql';
 import { ProjectModel } from '../models/Project.model.js';
-
 import { ModuleType, FrontFrame, BackendEnv, Cms, Database, Project, Packages } from '../types.js';
+import { packageMappings } from '../types/packageMappings.js';
 // import { Packages } from '../types/packages.js';
 
 // Function to generate the npm install commands
@@ -23,6 +23,8 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 		const { frontend, backend, title } = project;
 		const { framework, gqlClient, packages: frontPackages } = frontend;
 		const { environment, moduleType, gqlServer, packages: backPackages, database, cms } = backend;
+
+		console.log(frontend);
 
 		const {
 			GraphqlCodegenCli,
@@ -160,10 +162,13 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 			}
 		}
 
-		// Construct npm install commands
-		const frontendInstalls = `npm install ${frontendPackages.join(' ')}`;
+		const frontendPackageNames = frontendPackages.map((pkg) => packageMappings[pkg]);
+		const backendPackageNames = backendPackages.map((pkg) => packageMappings[pkg]);
 
-		const backendInstalls = `npm install ${backendPackages.join(' ')}`;
+		// Construct npm install commands
+		const frontendInstalls = `npm install ${frontendPackageNames.join(' ')}`;
+
+		const backendInstalls = `npm install ${backendPackageNames.join(' ')}`;
 
 		// Combine all commands
 		const frontendInstallCommands = frontendCommands.concat(frontendInstalls).join('\n');
