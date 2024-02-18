@@ -41,9 +41,9 @@ const typeDefs = gql`
 		bcryptts
 		tsx
 		dotenv
-		GRAPHQL_CODEGEN_CLI
-		GRAPHQL_CODEGEN_TYPESCRIPT
-		GRAPHQL_CODEGEN_TYPESCRIPT_RESOLVERS
+		graphql_codegen_cli
+		graphql_codegen_typescript
+		graphql_codegen_typescript_resolvers
 		nodemon
 		tsup
 		apolloClient
