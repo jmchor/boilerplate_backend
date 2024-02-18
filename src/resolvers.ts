@@ -1,5 +1,6 @@
 import { GraphQLError } from 'graphql';
 import { genSaltSync, hashSync } from 'bcrypt-ts';
+
 import { Article, Project, Resolvers, User } from './types.js';
 
 // import jwt from 'jsonwebtoken';
@@ -85,6 +86,8 @@ const resolvers: Resolvers = {
 			});
 		},
 	},
+
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 
 	Mutation: {
 		createProject: async (

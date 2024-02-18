@@ -1,6 +1,5 @@
 import gql from 'graphql-tag';
 
-// test stuff
 const typeDefs = gql`
 	# enums
 

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 // This is index.ts
+
 import { ApolloServer, BaseContext } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 
@@ -12,6 +13,7 @@ async function startApolloServer() {
 	const server: ApolloServer<BaseContext> = new ApolloServer({
 		typeDefs,
 		resolvers,
+
 		// context: async ({ req }) => {
 		// 	//   if (!req || !req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) {
 		// 	//     return {};
