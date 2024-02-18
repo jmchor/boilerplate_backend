@@ -1,5 +1,4 @@
 import { GraphQLResolveInfo } from 'graphql';
-import { Packages } from './types/packages';
 
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -9,7 +8,6 @@ export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Mayb
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
-export type EnumResolverSignature<T, AllowedValues = any> = { [key in keyof T]?: AllowedValues };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
 	ID: { input: string; output: string };
@@ -185,7 +183,34 @@ export type MutationEditProjectArgs = {
 	title?: InputMaybe<Scalars['String']['input']>;
 };
 
-export { Packages };
+export enum Packages {
+	ApolloClient = 'apolloClient',
+	ApolloServer = 'apolloServer',
+	Bcryptjs = 'bcryptjs',
+	Bcryptts = 'bcryptts',
+	Cors = 'cors',
+	Dotenv = 'dotenv',
+	Express = 'express',
+	Graphql = 'graphql',
+	GraphqlTag = 'graphqlTag',
+	GraphqlCodegenCli = 'graphql_codegen_cli',
+	GraphqlCodegenTypescript = 'graphql_codegen_typescript',
+	GraphqlCodegenTypescriptResolvers = 'graphql_codegen_typescript_resolvers',
+	Jsonwebtoken = 'jsonwebtoken',
+	Mongoose = 'mongoose',
+	Nodemon = 'nodemon',
+	Pg = 'pg',
+	Tsup = 'tsup',
+	Tsx = 'tsx',
+	TypesBcryptjs = 'typesBcryptjs',
+	TypesCors = 'typesCors',
+	TypesExpress = 'typesExpress',
+	TypesJsonwebtoken = 'typesJsonwebtoken',
+	TypesNode = 'typesNode',
+	TypesNodemon = 'typesNodemon',
+	TypesPg = 'typesPg',
+	Typescript = 'typescript',
+}
 
 export type Project = {
 	__typename?: 'Project';
@@ -458,38 +483,6 @@ export type MutationResolvers<
 	>;
 };
 
-export type PackagesResolvers = EnumResolverSignature<
-	{
-		GRAPHQL_CODEGEN_CLI?: any;
-		GRAPHQL_CODEGEN_TYPESCRIPT?: any;
-		GRAPHQL_CODEGEN_TYPESCRIPT_RESOLVERS?: any;
-		apolloClient?: any;
-		apolloServer?: any;
-		bcryptjs?: any;
-		bcryptts?: any;
-		cors?: any;
-		dotenv?: any;
-		express?: any;
-		graphql?: any;
-		graphqlTag?: any;
-		jsonwebtoken?: any;
-		mongoose?: any;
-		nodemon?: any;
-		pg?: any;
-		tsup?: any;
-		tsx?: any;
-		typesBcryptjs?: any;
-		typesCors?: any;
-		typesExpress?: any;
-		typesJsonwebtoken?: any;
-		typesNode?: any;
-		typesNodemon?: any;
-		typesPg?: any;
-		typescript?: any;
-	},
-	ResolversTypes['Packages']
->;
-
 export type ProjectResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['Project'] = ResolversParentTypes['Project'],
@@ -552,7 +545,6 @@ export type Resolvers<ContextType = any> = {
 	InstallScripts?: InstallScriptsResolvers<ContextType>;
 	Kanban?: KanbanResolvers<ContextType>;
 	Mutation?: MutationResolvers<ContextType>;
-	Packages?: PackagesResolvers;
 	Project?: ProjectResolvers<ContextType>;
 	Query?: QueryResolvers<ContextType>;
 	User?: UserResolvers<ContextType>;
