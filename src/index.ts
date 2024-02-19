@@ -1,45 +1,60 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-// This is index.ts
-
-import { ApolloServer, BaseContext } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import { GraphQLError } from 'graphql';
 
-import { connectToMongoDB } from './db.js';
+import { ApolloServer } from '@apollo/server';
+import typeDefs from './schema'; // Assuming typeDefs and resolvers are imported from other files
+import resolvers from './resolvers';
+import { UserModel } from './models/User.model';
+import { connectToMongoDB } from './db';
+import { User } from './types';
 
-import resolvers from './resolvers.js';
-import typeDefs from './schema.js';
+interface AuthHeaders {
+	authorization?: string;
+}
 
-async function startApolloServer() {
-	const server: ApolloServer<BaseContext> = new ApolloServer({
-		typeDefs,
-		resolvers,
+interface RequestContext {
+	req: {
+		headers: AuthHeaders;
+	};
+}
 
-		// context: async ({ req }) => {
-		// 	//   if (!req || !req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) {
-		// 	//     return {};
-		// 	//   }
+function getAuthToken(req: RequestContext['req']): string | undefined {
+	return req.headers.authorization;
+}
 
-		// 	//   const token = req.headers.authorization.split(' ')[1];
-		// 	//   try {
-		// 	//     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-		// 	//     const currentUser = await User.findById(decodedToken.id);
-		// 	//     return { currentUser };
-		// 	//   } catch (error) {
-		// 	//     return {};
-		// 	//   }
-		// },
-	});
+const server = new ApolloServer({
+	typeDefs,
+	resolvers,
+});
 
+async function startServer() {
 	const { url } = await startStandaloneServer(server, {
 		listen: { port: 4000 },
+		context: async ({ req }: RequestContext) => {
+			const auth = getAuthToken(req);
+			if (auth && auth.startsWith('Bearer ')) {
+				const decodedToken = jwt.verify(
+					auth.substring(7),
+					process.env.JWT_SECRET
+				) as JwtPayload;
+
+				const currentUser: User = await UserModel.findById(decodedToken.userId); // Assuming User.findById returns a Promise
+
+				return { currentUser };
+			}
+		},
 	});
 
+	void connectToMongoDB();
+
 	console.log(`
-	📊 Connected to MongoDB
+    📊 Connected to MongoDB
     🚀  Server is running!
     📭  Query at ${url}
   `);
 }
 
-await startApolloServer();
-await connectToMongoDB();
+startServer().catch((error) => {
+	console.error('Error starting server:', error);
+});
