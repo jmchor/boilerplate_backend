@@ -1,16 +1,28 @@
 import { GraphQLError } from 'graphql';
-import { genSaltSync, hashSync } from 'bcrypt-ts';
+import { genSaltSync, hashSync, compareSync } from 'bcrypt-ts';
 import mongoose, { ClientSession } from 'mongoose';
 
-import { Article, Project, Resolvers, User } from './types.js';
-
-// import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
+import { config } from 'dotenv';
+import { Article, Project, Resolvers, Token, User } from './types.js';
 
 import { generateInstallCommands } from './scripts/installCommands.js';
 import { ProjectModel } from './models/Project.model.js';
 import { ArticleModel } from './models/Article.model.js';
 import { UserModel } from './models/User.model.js';
 import { KanbanModel } from './models/Kanban.model.js';
+
+interface HttpRequest {
+	headers: {
+		authorization?: string;
+	};
+}
+
+interface LoginInput {
+	email?: string;
+	username?: string;
+	password: string;
+}
 
 const resolvers: Resolvers = {
 	Query: {
@@ -405,6 +417,48 @@ const resolvers: Resolvers = {
 					},
 				});
 			}
+		},
+
+		login: async (
+			parent,
+			{ input }: { input: LoginInput },
+			{ req }: { req: HttpRequest }
+		): Promise<Token> => {
+			const { email, username, password } = input;
+
+			const secretKey: string = process.env.JWT_SECRET;
+			let user: User;
+
+			if (email) {
+				user = await UserModel.findOne({ email });
+			} else if (username) {
+				user = await UserModel.findOne({ username });
+			}
+
+			if (!user) {
+				throw new GraphQLError('Invalid email or username', {
+					extensions: {
+						code: 'INVALID_INPUT',
+						invalidArgs: { email, username },
+					},
+				});
+			}
+
+			const isValidPassword = compareSync(password, user.passwordHash);
+
+			if (!isValidPassword) {
+				throw new GraphQLError('Invalid password', {
+					extensions: {
+						code: 'INVALID_INPUT',
+						invalidArgs: password,
+					},
+				});
+			}
+
+			const value = jwt.sign({ userId: user._id }, secretKey, {
+				expiresIn: '1d',
+			});
+			return { value };
 		},
 	},
 };
