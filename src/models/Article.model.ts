@@ -1,16 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import mongoose, { Model, Schema, model } from 'mongoose';
 import { ProjectModel } from './Project.model.js';
 import { UserModel } from './User.model.js';
 import { Article } from '../types.js';
-
-// export interface ArticleDocument extends Document {
-// 	title: string;
-// 	text: string;
-// 	imageUrl?: string;
-// 	externalLink?: string;
-// 	linkedProjects?: (mongoose.Types.ObjectId | string)[];
-// 	createdBy: mongoose.Types.ObjectId | string;
-// }
 
 const articleSchema = new Schema<Article>(
 	{
