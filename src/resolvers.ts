@@ -1,3 +1,4 @@
+import { BaseContext } from '@apollo/server';
 import { GraphQLError } from 'graphql';
 import { genSaltSync, hashSync, compareSync } from 'bcrypt-ts';
 import mongoose, { ClientSession } from 'mongoose';
@@ -11,12 +12,6 @@ import { ProjectModel } from './models/Project.model.js';
 import { ArticleModel } from './models/Article.model.js';
 import { UserModel } from './models/User.model.js';
 import { KanbanModel } from './models/Kanban.model.js';
-
-interface HttpRequest {
-	headers: {
-		authorization?: string;
-	};
-}
 
 interface LoginInput {
 	email?: string;
@@ -45,7 +40,15 @@ const resolvers: Resolvers = {
 			return populatedProjects;
 		},
 
-		findProject: async (parent, { _id }): Promise<Project> => {
+		findProject: async (parent, { _id }, { currentUser }): Promise<Project> => {
+			if (!currentUser) {
+				throw new GraphQLError('Unauthorized', {
+					extensions: {
+						code: 'UNAUTHORIZED',
+						http: { status: 401 },
+					},
+				});
+			}
 			const project = await ProjectModel.findById(_id);
 
 			if (!project) {
@@ -63,7 +66,7 @@ const resolvers: Resolvers = {
 				model: UserModel,
 			});
 		},
-		allArticles: async (): Promise<Article[]> => {
+		allArticles: async (parent, args): Promise<Article[]> => {
 			const articles = await ArticleModel.find();
 
 			if (!articles) {
@@ -419,11 +422,7 @@ const resolvers: Resolvers = {
 			}
 		},
 
-		login: async (
-			parent,
-			{ input }: { input: LoginInput },
-			{ req }: { req: HttpRequest }
-		): Promise<Token> => {
+		login: async (parent, { input }: { input: LoginInput }, context): Promise<Token> => {
 			const { email, username, password } = input;
 
 			const secretKey: string = process.env.JWT_SECRET;
@@ -458,6 +457,7 @@ const resolvers: Resolvers = {
 			const value = jwt.sign({ userId: user._id }, secretKey, {
 				expiresIn: '1d',
 			});
+
 			return { value };
 		},
 	},
