@@ -16,6 +16,7 @@ const articleSchema = new Schema<Article>(
 	{
 		imageUrl: {
 			type: String,
+			default: '',
 		},
 		title: {
 			type: String,
