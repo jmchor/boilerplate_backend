@@ -1,5 +1,6 @@
 import { GraphQLError } from 'graphql';
 import { genSaltSync, hashSync } from 'bcrypt-ts';
+import mongoose, { ClientSession } from 'mongoose';
 
 import { Article, Project, Resolvers, User } from './types.js';
 
@@ -183,45 +184,6 @@ const resolvers: Resolvers = {
 				});
 			}
 		},
-		addInstallScript: async (parent, { _id }): Promise<Project> => {
-			try {
-				// Check if _id is valid (you might want to add more validation here)
-				if (!_id) {
-					throw new GraphQLError('Invalid project ID', {
-						extensions: {
-							code: 'INVALID_INPUT',
-							invalidArgs: _id,
-						},
-					});
-				}
-
-				const projectToUpdate = await generateInstallCommands(_id);
-				const {
-					installScripts,
-					frontend: { packages: frontendPackages },
-					backend: { packages: backendPackages },
-				} = projectToUpdate;
-
-				const updatedProject = await ProjectModel.findByIdAndUpdate(
-					_id,
-					{
-						installScripts,
-						frontend: { packages: frontendPackages },
-						backend: { packages: backendPackages },
-					},
-					{ new: true }
-				);
-
-				return updatedProject;
-			} catch (error) {
-				throw new GraphQLError('Failed to add install scripts', {
-					extensions: {
-						code: 'INVALID_INPUT',
-						invalidArgs: _id,
-					},
-				});
-			}
-		},
 
 		editProject: async (parent, { _id, title, description }): Promise<Project> => {
 			try {
@@ -288,10 +250,19 @@ const resolvers: Resolvers = {
 						break;
 				}
 
+				let defaultImage: string;
+
+				if (imageUrl === '') {
+					defaultImage =
+						'https://res.cloudinary.com/dompqbumr/image/upload/v1708283369/codeBase/default_article_banner_0012.jpg';
+				} else {
+					defaultImage = imageUrl;
+				}
+
 				const newArticleData = {
 					title,
 					text,
-					imageUrl,
+					imageUrl: defaultImage,
 					externalLink,
 					createdBy,
 				};
@@ -314,6 +285,65 @@ const resolvers: Resolvers = {
 						externalLink,
 						createdBy,
 						error,
+					},
+				});
+			}
+		},
+
+		linkArticleToProject: async (
+			parent,
+			{ _id, projectId }: { _id: string; projectId: string }
+		): Promise<Article> => {
+			const session: ClientSession = await mongoose.startSession();
+			session.startTransaction();
+			try {
+				// Check if _id is valid (you might want to add more validation here)
+				if (!_id || !projectId) {
+					throw new GraphQLError('Invalid article or project ID', {
+						extensions: {
+							code: 'INVALID_INPUT',
+							invalidArgs: { _id, projectId },
+						},
+					});
+				}
+
+				await ArticleModel.findByIdAndUpdate(
+					_id,
+					{
+						linkedProjects: projectId,
+					},
+					{ new: true }
+				);
+
+				await ProjectModel.findByIdAndUpdate(
+					projectId,
+					{ $addToSet: { articles: _id } },
+					{ new: true }
+				);
+
+				const populatedArticle = await ArticleModel.findById(_id)
+					.populate({
+						path: 'linkedProjects',
+						model: ProjectModel,
+					})
+					.populate({
+						path: 'createdBy',
+						model: UserModel,
+					})
+					.session(session);
+
+				await session.commitTransaction();
+				await session.endSession();
+
+				return populatedArticle;
+			} catch (error) {
+				await session.abortTransaction();
+				await session.endSession();
+				throw new GraphQLError('Failed to link article to project', {
+					extensions: {
+						code: 'INVALID_INPUT',
+						invalidArgs: _id,
+						projectId,
 					},
 				});
 			}
