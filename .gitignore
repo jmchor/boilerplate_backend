@@ -3,3 +3,4 @@ dist
 src/seedfiles
 .env
 src/seedfiles/seedKanban.ts
+abandoned-code.ts
