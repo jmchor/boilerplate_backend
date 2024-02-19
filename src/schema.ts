@@ -160,6 +160,16 @@ const typeDefs = gql`
 		createdBy: ID!
 	}
 
+	input LoginInput {
+		email: String
+		username: String
+		password: String!
+	}
+
+	type Token {
+		value: String!
+	}
+
 	type Query {
 		allProjects: [Project]
 		findProject(_id: ID): Project
@@ -201,6 +211,8 @@ const typeDefs = gql`
 		linkArticleToProject(_id: ID!, projectId: ID!): Article
 
 		createUser(username: String!, email: String!, password: String!): User
+
+		login(input: LoginInput!): Token
 	}
 `;
 

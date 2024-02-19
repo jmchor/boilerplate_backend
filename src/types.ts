@@ -123,6 +123,12 @@ export type KanbanInput = {
   todo?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
+export type LoginInput = {
+  email?: InputMaybe<Scalars['String']['input']>;
+  password: Scalars['String']['input'];
+  username?: InputMaybe<Scalars['String']['input']>;
+};
+
 export enum ModuleType {
   Commonjs = 'commonjs',
   Module = 'module'
@@ -138,6 +144,7 @@ export type Mutation = {
   deleteProject?: Maybe<Project>;
   editProject?: Maybe<Project>;
   linkArticleToProject?: Maybe<Article>;
+  login?: Maybe<Token>;
 };
 
 
@@ -195,6 +202,11 @@ export type MutationEditProjectArgs = {
 export type MutationLinkArticleToProjectArgs = {
   _id: Scalars['ID']['input'];
   projectId: Scalars['ID']['input'];
+};
+
+
+export type MutationLoginArgs = {
+  input: LoginInput;
 };
 
 export enum Packages {
@@ -262,6 +274,11 @@ export type QueryFindProjectArgs = {
 export type QuerySearchProjectArgs = {
   _id?: InputMaybe<Scalars['ID']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type Token = {
+  __typename?: 'Token';
+  value: Scalars['String']['output'];
 };
 
 export type User = {
@@ -361,12 +378,14 @@ export type ResolversTypes = {
   InstallScriptsInput: InstallScriptsInput;
   Kanban: ResolverTypeWrapper<Kanban>;
   KanbanInput: KanbanInput;
+  LoginInput: LoginInput;
   ModuleType: ModuleType;
   Mutation: ResolverTypeWrapper<{}>;
   Packages: Packages;
   Project: ResolverTypeWrapper<Project>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  Token: ResolverTypeWrapper<Token>;
   User: ResolverTypeWrapper<User>;
 };
 
@@ -384,10 +403,12 @@ export type ResolversParentTypes = {
   InstallScriptsInput: InstallScriptsInput;
   Kanban: Kanban;
   KanbanInput: KanbanInput;
+  LoginInput: LoginInput;
   Mutation: {};
   Project: Project;
   Query: {};
   String: Scalars['String']['output'];
+  Token: Token;
   User: User;
 };
 
@@ -445,6 +466,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   deleteProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<MutationDeleteProjectArgs, '_id'>>;
   editProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<MutationEditProjectArgs, '_id'>>;
   linkArticleToProject?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType, RequireFields<MutationLinkArticleToProjectArgs, '_id' | 'projectId'>>;
+  login?: Resolver<Maybe<ResolversTypes['Token']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'input'>>;
 };
 
 export type ProjectResolvers<ContextType = any, ParentType extends ResolversParentTypes['Project'] = ResolversParentTypes['Project']> = {
@@ -468,6 +490,11 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   searchProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, Partial<QuerySearchProjectArgs>>;
 };
 
+export type TokenResolvers<ContextType = any, ParentType extends ResolversParentTypes['Token'] = ResolversParentTypes['Token']> = {
+  value?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   _id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   articles?: Resolver<Maybe<Array<Maybe<ResolversTypes['Article']>>>, ParentType, ContextType>;
@@ -487,6 +514,7 @@ export type Resolvers<ContextType = any> = {
   Mutation?: MutationResolvers<ContextType>;
   Project?: ProjectResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Token?: TokenResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };
 
