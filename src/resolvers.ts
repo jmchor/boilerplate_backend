@@ -151,7 +151,7 @@ const resolvers: Resolvers = {
 
 				// associate the new Kanban with the new project
 
-				const addKanbanToProject = await ProjectModel.findByIdAndUpdate(
+				await ProjectModel.findByIdAndUpdate(
 					updatedProject._id,
 					{
 						kanban: newKanban._id,
