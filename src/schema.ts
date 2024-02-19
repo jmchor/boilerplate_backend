@@ -194,8 +194,11 @@ const typeDefs = gql`
 			text: String!
 			imageUrl: String
 			externalLink: String
+			linkedProjects: [ID]
 			createdBy: ID!
 		): Article
+
+		linkArticleToProject(_id: ID!, projectId: ID!): Article
 
 		createUser(username: String!, email: String!, password: String!): User
 	}
