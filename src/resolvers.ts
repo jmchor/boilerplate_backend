@@ -1,10 +1,10 @@
-import { BaseContext } from '@apollo/server';
 import { GraphQLError } from 'graphql';
 import { genSaltSync, hashSync, compareSync } from 'bcrypt-ts';
 import mongoose, { ClientSession } from 'mongoose';
 
 import jwt from 'jsonwebtoken';
-import { config } from 'dotenv';
+import cookie from 'cookie';
+import express, { Request, Response } from 'express';
 import { Article, Project, Resolvers, Token, User } from './types.js';
 
 import { generateInstallCommands } from './scripts/installCommands.js';
@@ -66,7 +66,16 @@ const resolvers: Resolvers = {
 				model: UserModel,
 			});
 		},
-		allArticles: async (parent, args): Promise<Article[]> => {
+		allArticles: async (parent, args, { req }): Promise<Article[]> => {
+			if (!req.currentUser) {
+				throw new GraphQLError('Unauthorized', {
+					extensions: {
+						code: 'UNAUTHORIZED',
+						http: { status: 401 },
+					},
+				});
+			}
+
 			const articles = await ArticleModel.find();
 
 			if (!articles) {
@@ -422,9 +431,12 @@ const resolvers: Resolvers = {
 			}
 		},
 
-		login: async (parent, { input }: { input: LoginInput }, context): Promise<Token> => {
+		login: async (
+			parent,
+			{ input }: { input: LoginInput },
+			{ res, req }: { res: Response; req: Request }
+		): Promise<Token> => {
 			const { email, username, password } = input;
-
 			const secretKey: string = process.env.JWT_SECRET;
 			let user: User;
 
@@ -454,11 +466,18 @@ const resolvers: Resolvers = {
 				});
 			}
 
-			const value = jwt.sign({ userId: user._id }, secretKey, {
+			const token = jwt.sign({ userId: user._id }, secretKey, {
 				expiresIn: '1d',
 			});
 
-			return { value };
+			// res.cookie('token', token, {
+			// 	httpOnly: true,
+			// 	secure: true,
+			// 	expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day
+			// 	sameSite: true,
+			// });
+
+			return { value: token };
 		},
 	},
 };
