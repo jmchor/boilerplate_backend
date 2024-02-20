@@ -40,7 +40,7 @@ const resolvers: Resolvers = {
 			return populatedProjects;
 		},
 
-		findProject: async (parent, { _id }, { currentUser }): Promise<Project> => {
+		findProject: async (_, { _id }, { currentUser }): Promise<Project> => {
 			if (!currentUser) {
 				throw new GraphQLError('Unauthorized', {
 					extensions: {
@@ -66,7 +66,7 @@ const resolvers: Resolvers = {
 				model: UserModel,
 			});
 		},
-		allArticles: async (parent, args, { req }): Promise<Article[]> => {
+		allArticles: async (_, args, { req }): Promise<Article[]> => {
 			if (!req.currentUser) {
 				throw new GraphQLError('Unauthorized', {
 					extensions: {
@@ -93,7 +93,7 @@ const resolvers: Resolvers = {
 
 			return populatedArticles;
 		},
-		findArticle: async (parent, { _id }): Promise<Article> => {
+		findArticle: async (_, { _id }): Promise<Article> => {
 			const article = await ArticleModel.findById(_id);
 
 			if (!article) {
@@ -109,6 +109,67 @@ const resolvers: Resolvers = {
 				path: 'createdBy',
 				model: UserModel,
 			});
+		},
+
+		currentUser: async (_, __, { currentUser }: { currentUser: User }): Promise<User> => {
+			if (!currentUser) {
+				throw new GraphQLError('Unauthorized', {
+					extensions: {
+						code: 'UNAUTHORIZED',
+						http: { status: 401 },
+					},
+				});
+			}
+
+			const user: User = await UserModel.findById(currentUser._id)
+				.populate({
+					path: 'projects',
+					model: ProjectModel,
+				})
+				.populate({
+					path: 'articles',
+					model: ArticleModel,
+				})
+				.populate({
+					path: 'likedArticles',
+					model: ArticleModel,
+				});
+
+			if (!user) {
+				throw new GraphQLError('User not found', {
+					extensions: {
+						code: 'NOT_FOUND',
+						invalidArgs: currentUser._id,
+					},
+				});
+			}
+
+			console.log(user);
+
+			return user;
+		},
+
+		myProjects: async (_, __, { currentUser }: { currentUser: User }): Promise<Project[]> => {
+			if (!currentUser) {
+				throw new GraphQLError('Unauthorized', {
+					extensions: {
+						code: 'UNAUTHORIZED',
+						http: { status: 401 },
+					},
+				});
+			}
+
+			const projects = await ProjectModel.find({ createdBy: currentUser._id })
+				.populate({
+					path: 'articles',
+					model: ArticleModel,
+				})
+				.populate({
+					path: 'kanban',
+					model: KanbanModel,
+				});
+
+			return projects;
 		},
 	},
 
@@ -209,7 +270,7 @@ const resolvers: Resolvers = {
 			}
 		},
 
-		editProject: async (parent, { _id, title, description }): Promise<Project> => {
+		editProject: async (_, { _id, title, description }): Promise<Project> => {
 			try {
 				// Check if _id is valid (you might want to add more validation here)
 				if (!_id) {
@@ -241,7 +302,7 @@ const resolvers: Resolvers = {
 			}
 		},
 
-		createArticle: async (parent, { title, text, imageUrl, externalLink, createdBy }): Promise<Article> => {
+		createArticle: async (_, { title, text, imageUrl, externalLink, createdBy }): Promise<Article> => {
 			try {
 				console.log('Checking if article already exists...');
 				const existingArticle = await ArticleModel.findOne({ title });
@@ -295,6 +356,16 @@ const resolvers: Resolvers = {
 
 				await newArticle.save();
 
+				// update Users articles
+
+				await UserModel.findByIdAndUpdate(createdBy, {
+					$push: {
+						articles: newArticle._id,
+					},
+				});
+
+				console.log('Article created successfully');
+
 				return newArticle.populate({
 					path: 'createdBy',
 					model: UserModel,
@@ -315,7 +386,7 @@ const resolvers: Resolvers = {
 		},
 
 		linkArticleToProject: async (
-			parent,
+			_,
 			{ _id, projectId }: { _id: string; projectId: string }
 		): Promise<Article> => {
 			const session: ClientSession = await mongoose.startSession();
@@ -373,7 +444,7 @@ const resolvers: Resolvers = {
 			}
 		},
 
-		createUser: async (parent, { username, email, password }): Promise<User> => {
+		createUser: async (_, { username, email, password }): Promise<User> => {
 			try {
 				const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 				if (!emailRegex.test(email)) {
@@ -432,7 +503,7 @@ const resolvers: Resolvers = {
 		},
 
 		login: async (
-			parent,
+			_,
 			{ input }: { input: LoginInput },
 			{ res, req }: { res: Response; req: Request }
 		): Promise<Token> => {
