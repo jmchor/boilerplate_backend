@@ -169,6 +169,10 @@ const resolvers: Resolvers = {
 					model: KanbanModel,
 				});
 
+			if (!projects) {
+				throw new GraphQLError('No projects found');
+			}
+
 			return projects;
 		},
 	},
@@ -502,6 +506,120 @@ const resolvers: Resolvers = {
 			}
 		},
 
+		editUser: async (
+			_,
+			{ _id, username, email }: { _id: string; username: string; email: string },
+			{ currentUser }: { currentUser: User }
+		): Promise<User> => {
+			if (!currentUser || currentUser._id.toString() !== _id) {
+				throw new GraphQLError('Unauthorized To Edit', {
+					extensions: {
+						code: 'UNAUTHORIZED',
+						http: { status: 401 },
+					},
+				});
+			}
+
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+			if (!emailRegex.test(email)) {
+				throw new GraphQLError('Email address is malformed', {
+					extensions: {
+						code: 'INVALID_INPUT',
+						invalidArgs: email,
+					},
+				});
+			}
+
+			try {
+				const existingEmail = await UserModel.findOne({ email });
+
+				if (existingEmail) {
+					throw new GraphQLError(`User with email ${email} already exists`);
+				}
+
+				const existingUsername = await UserModel.findOne({ username });
+
+				if (existingUsername) {
+					throw new GraphQLError(`User with username ${username} already exists`);
+				}
+
+				const updateUser = await UserModel.findByIdAndUpdate(
+					_id,
+					{
+						username,
+						email,
+					},
+					{ new: true }
+				);
+				return updateUser;
+			} catch (error: unknown) {
+				throw new GraphQLError('Failed to update user', {
+					extensions: {
+						code: 'INTERNAL_SERVER_ERROR',
+						invalidArgs: _id,
+						username,
+						email,
+						error,
+					},
+				});
+			}
+		},
+
+		updatePassword: async (
+			_,
+			{ _id, oldPassword, newPassword }: { _id: string; oldPassword: string; newPassword: string },
+			{ currentUser }: { currentUser: User }
+		): Promise<User> => {
+			if (!currentUser || currentUser._id.toString() !== _id) {
+				throw new GraphQLError('Unauthorized To Update Password', {
+					extensions: {
+						code: 'UNAUTHORIZED',
+						http: { status: 401 },
+					},
+				});
+			}
+
+			const isValidPassword = compareSync(oldPassword, currentUser.passwordHash);
+
+			if (!isValidPassword) {
+				throw new GraphQLError('Invalid password', {
+					extensions: {
+						code: 'INVALID_INPUT',
+						invalidArgs: oldPassword,
+					},
+				});
+			}
+
+			const passwordRegex =
+				/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?-]).{6,}/;
+			if (!passwordRegex.test(newPassword)) {
+				throw new GraphQLError(
+					'Password must be at least 6 characters long, and must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+					{
+						extensions: {
+							code: 'INVALID_INPUT',
+							invalidArgs: newPassword,
+						},
+					}
+				);
+			}
+
+			const salt = genSaltSync(10);
+			const hashedPassword = hashSync(newPassword, salt);
+
+			const updateUser = await UserModel.findByIdAndUpdate(
+				_id,
+				{
+					passwordHash: hashedPassword,
+				},
+				{ new: true }
+			);
+
+			// add logout logic
+
+			return updateUser;
+		},
+
 		login: async (
 			_,
 			{ input }: { input: LoginInput },
@@ -549,6 +667,18 @@ const resolvers: Resolvers = {
 			// });
 
 			return { value: token };
+		},
+
+		// TODO testing
+		// eslint-disable-next-line @typescript-eslint/require-await
+		logout: async (_, __, { res }): Promise<boolean> => {
+			res.clearCookie('token', {
+				httpOnly: true,
+				expires: new Date(0),
+				secure: true,
+				sameSite: true,
+			});
+			return true;
 		},
 	},
 };
