@@ -255,8 +255,10 @@ export type Query = {
   __typename?: 'Query';
   allArticles?: Maybe<Array<Maybe<Article>>>;
   allProjects?: Maybe<Array<Maybe<Project>>>;
+  currentUser?: Maybe<User>;
   findArticle?: Maybe<Article>;
   findProject?: Maybe<Project>;
+  myProjects?: Maybe<Array<Maybe<Project>>>;
   searchProject?: Maybe<Project>;
 };
 
@@ -286,6 +288,7 @@ export type User = {
   _id?: Maybe<Scalars['ID']['output']>;
   articles?: Maybe<Array<Maybe<Article>>>;
   email: Scalars['String']['output'];
+  likedArticles?: Maybe<Array<Maybe<Article>>>;
   passwordHash: Scalars['String']['output'];
   projects?: Maybe<Array<Maybe<Project>>>;
   username: Scalars['String']['output'];
@@ -485,8 +488,10 @@ export type ProjectResolvers<ContextType = any, ParentType extends ResolversPare
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   allArticles?: Resolver<Maybe<Array<Maybe<ResolversTypes['Article']>>>, ParentType, ContextType>;
   allProjects?: Resolver<Maybe<Array<Maybe<ResolversTypes['Project']>>>, ParentType, ContextType>;
+  currentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   findArticle?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType, Partial<QueryFindArticleArgs>>;
   findProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, Partial<QueryFindProjectArgs>>;
+  myProjects?: Resolver<Maybe<Array<Maybe<ResolversTypes['Project']>>>, ParentType, ContextType>;
   searchProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, Partial<QuerySearchProjectArgs>>;
 };
 
@@ -499,6 +504,7 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
   _id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   articles?: Resolver<Maybe<Array<Maybe<ResolversTypes['Article']>>>, ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  likedArticles?: Resolver<Maybe<Array<Maybe<ResolversTypes['Article']>>>, ParentType, ContextType>;
   passwordHash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   projects?: Resolver<Maybe<Array<Maybe<ResolversTypes['Project']>>>, ParentType, ContextType>;
   username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

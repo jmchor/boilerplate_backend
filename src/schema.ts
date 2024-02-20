@@ -1,18 +1,5 @@
 import gql from 'graphql-tag';
 
-import { startStandaloneServer } from '@apollo/server-standalone';
-import jwt from 'jsonwebtoken';
-import { ApolloServer } from 'apollo-server-express';
-import { GraphQLError } from 'graphql';
-import { compareSync } from 'bcrypt'; // Assuming you're using bcrypt for password hashing
-import cookie from 'cookie';
-import express, { Request, Response } from 'express';
-import cors from 'cors';
-import typeDefs from './schema';
-import resolvers from './resolvers';
-import { UserModel } from './models/User.model';
-import { connectToMongoDB } from './db';
-
 const typeDefs = gql`
 	# enums
 
@@ -80,6 +67,7 @@ const typeDefs = gql`
 		passwordHash: String!
 		projects: [Project]
 		articles: [Article]
+		likedArticles: [Article]
 		_id: ID
 	}
 
@@ -190,6 +178,10 @@ const typeDefs = gql`
 
 		allArticles: [Article]
 		findArticle(_id: ID): Article
+
+		currentUser: User
+
+		myProjects: [Project]
 	}
 
 	type Mutation {
