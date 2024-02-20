@@ -4,18 +4,18 @@ import { ProjectModel } from './Project.model.js';
 import { ArticleModel } from './Article.model.js';
 import { User } from '../types.js';
 
-interface Articles {
-	authored: (mongoose.Types.ObjectId | string | null)[];
-	liked: (mongoose.Types.ObjectId | string | null)[];
-}
+// interface Articles {
+// 	authored: (mongoose.Types.ObjectId | string | null)[];
+// 	liked: (mongoose.Types.ObjectId | string | null)[];
+// }
 
-export interface UserDocument extends Document {
-	username: string;
-	email: string;
-	passwordHash: string;
-	projects?: (mongoose.Types.ObjectId | string | null)[];
-	articles?: Articles[];
-}
+// export interface UserDocument extends Document {
+// 	username: string;
+// 	email: string;
+// 	passwordHash: string;
+// 	projects?: (mongoose.Types.ObjectId | string | null)[];
+// 	articles?: Articles[];
+// }
 
 const userSchema = new Schema<User>(
 	{
@@ -44,22 +44,21 @@ const userSchema = new Schema<User>(
 				ref: 'ProjectModel',
 			},
 		],
-		articles: {
-			authored: [
-				{
-					type: mongoose.Schema.Types.ObjectId,
-					ref: 'Article',
-					default: [],
-				},
-			],
-			liked: [
-				{
-					type: mongoose.Schema.Types.ObjectId,
-					ref: 'Article',
-					default: [],
-				},
-			],
-		},
+
+		articles: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'Article',
+				default: [],
+			},
+		],
+		likedArticles: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'Article',
+				default: [],
+			},
+		],
 	},
 	{
 		timestamps: true,
