@@ -204,6 +204,8 @@ const typeDefs = gql`
 
 		deleteArticle(_id: ID!): Article
 
+		deleteKanban(_id: ID!): Kanban
+
 		createArticle(
 			title: String!
 			text: String!
@@ -217,7 +219,13 @@ const typeDefs = gql`
 
 		createUser(username: String!, email: String!, password: String!): User
 
+		editUser(_id: ID!, username: String, email: String): User
+
+		updatePassword(_id: ID!, oldPassword: String!, newPassword: String!): User
+
 		login(input: LoginInput!): Token
+
+		logout: Boolean
 	}
 `;
 

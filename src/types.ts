@@ -141,10 +141,14 @@ export type Mutation = {
   createProject?: Maybe<Project>;
   createUser?: Maybe<User>;
   deleteArticle?: Maybe<Article>;
+  deleteKanban?: Maybe<Kanban>;
   deleteProject?: Maybe<Project>;
   editProject?: Maybe<Project>;
+  editUser?: Maybe<User>;
   linkArticleToProject?: Maybe<Article>;
   login?: Maybe<Token>;
+  logout?: Maybe<Scalars['Boolean']['output']>;
+  updatePassword?: Maybe<User>;
 };
 
 
@@ -187,6 +191,11 @@ export type MutationDeleteArticleArgs = {
 };
 
 
+export type MutationDeleteKanbanArgs = {
+  _id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteProjectArgs = {
   _id: Scalars['ID']['input'];
 };
@@ -199,6 +208,13 @@ export type MutationEditProjectArgs = {
 };
 
 
+export type MutationEditUserArgs = {
+  _id: Scalars['ID']['input'];
+  email?: InputMaybe<Scalars['String']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type MutationLinkArticleToProjectArgs = {
   _id: Scalars['ID']['input'];
   projectId: Scalars['ID']['input'];
@@ -207,6 +223,13 @@ export type MutationLinkArticleToProjectArgs = {
 
 export type MutationLoginArgs = {
   input: LoginInput;
+};
+
+
+export type MutationUpdatePasswordArgs = {
+  _id: Scalars['ID']['input'];
+  newPassword: Scalars['String']['input'];
+  oldPassword: Scalars['String']['input'];
 };
 
 export enum Packages {
@@ -466,10 +489,14 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'backend' | 'createdBy' | 'frontend' | 'title'>>;
   createUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'email' | 'password' | 'username'>>;
   deleteArticle?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType, RequireFields<MutationDeleteArticleArgs, '_id'>>;
+  deleteKanban?: Resolver<Maybe<ResolversTypes['Kanban']>, ParentType, ContextType, RequireFields<MutationDeleteKanbanArgs, '_id'>>;
   deleteProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<MutationDeleteProjectArgs, '_id'>>;
   editProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<MutationEditProjectArgs, '_id'>>;
+  editUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationEditUserArgs, '_id'>>;
   linkArticleToProject?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType, RequireFields<MutationLinkArticleToProjectArgs, '_id' | 'projectId'>>;
   login?: Resolver<Maybe<ResolversTypes['Token']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'input'>>;
+  logout?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  updatePassword?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationUpdatePasswordArgs, '_id' | 'newPassword' | 'oldPassword'>>;
 };
 
 export type ProjectResolvers<ContextType = any, ParentType extends ResolversParentTypes['Project'] = ResolversParentTypes['Project']> = {
