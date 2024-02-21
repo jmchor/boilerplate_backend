@@ -274,9 +274,28 @@ const resolvers: Resolvers = {
 			}
 		},
 
-		editProject: async (_, { _id, title, description }): Promise<Project> => {
+		editProject: async (
+			_,
+			{ _id, title, description, createdBy },
+			{ currentUser }: { currentUser: User }
+		): Promise<Project> => {
 			try {
-				// Check if _id is valid (you might want to add more validation here)
+				if (!currentUser) {
+					throw new GraphQLError('You must be logged in to edit a project', {
+						extensions: {
+							code: 'UNAUTHENTICATED',
+						},
+					});
+				}
+
+				if (currentUser._id.toString() !== createdBy) {
+					throw new GraphQLError('You do not have permission to edit this project', {
+						extensions: {
+							code: 'UNAUTHORIZED',
+						},
+					});
+				}
+
 				if (!_id) {
 					throw new GraphQLError('Invalid project ID', {
 						extensions: {
@@ -508,6 +527,11 @@ const resolvers: Resolvers = {
 				});
 			}
 		},
+
+		deleteArticle: async (
+			_,
+			{ _id, createdBy }: { _id: string; createdBy: string }
+		): Promise<Article> => {},
 
 		createUser: async (_, { username, email, password }): Promise<User> => {
 			try {
