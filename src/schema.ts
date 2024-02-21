@@ -198,11 +198,11 @@ const typeDefs = gql`
 		): Project
 		addInstallScript(_id: ID!): Project
 
-		editProject(_id: ID!, title: String, description: String): Project
+		editProject(_id: ID!, title: String, description: String, createdBy: ID): Project
 
-		deleteProject(_id: ID!): Project
+		deleteProject(_id: ID!, createdBy: ID): Project
 
-		deleteArticle(_id: ID!): Article
+		deleteArticle(_id: ID!, createdBy: ID): Article
 
 		deleteKanban(_id: ID!): Kanban
 
