@@ -182,8 +182,18 @@ const resolvers: Resolvers = {
 	Mutation: {
 		createProject: async (
 			parent,
-			{ title, description, createdBy, frontend, backend }
+			{ title, description, createdBy, frontend, backend },
+			{ currentUser }: { currentUser: User }
 		): Promise<Project> => {
+			if (!currentUser) {
+				throw new GraphQLError('Unauthorized', {
+					extensions: {
+						code: 'UNAUTHORIZED',
+						http: { status: 401 },
+					},
+				});
+			}
+
 			try {
 				const existingProject = await ProjectModel.findOne({ title });
 
@@ -325,7 +335,18 @@ const resolvers: Resolvers = {
 			}
 		},
 
-		createArticle: async (_, { title, text, imageUrl, externalLink, createdBy }): Promise<Article> => {
+		createArticle: async (
+			_,
+			{ title, text, imageUrl, externalLink, createdBy },
+			{ currentUser }: { currentUser: User }
+		): Promise<Article> => {
+			if (!currentUser) {
+				throw new GraphQLError('You must be logged in to create an article', {
+					extensions: {
+						code: 'UNAUTHENTICATED',
+					},
+				});
+			}
 			try {
 				console.log('Checking if article already exists...');
 				const existingArticle = await ArticleModel.findOne({ title });
