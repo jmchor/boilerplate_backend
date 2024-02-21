@@ -16,11 +16,15 @@ import { KanbanModel } from './models/Kanban.model.js';
 import { checkLoggedInUser } from './utils/checkLoggedInUser.js';
 import { checkUserIsAuthor } from './utils/checkUserIsAuthor.js';
 
-interface LoginInput {
-	email?: string;
-	username?: string;
-	password: string;
-}
+import {
+	BaseArgs,
+	CreateProjectArgs,
+	ArticleArgs,
+	DeleteDocument,
+	LinkArticleToProject,
+	LoginInput,
+	UpdatePasswordArgs,
+} from './types/argTypes.js';
 
 const resolvers: Resolvers = {
 	Query: {
@@ -94,7 +98,7 @@ const resolvers: Resolvers = {
 
 			return populatedArticles;
 		},
-		findArticle: async (_, { _id }: { _id: string }): Promise<Article> => {
+		findArticle: async (_, { _id }: BaseArgs): Promise<Article> => {
 			const article = await ArticleModel.findById(_id);
 
 			if (!article) {
@@ -169,7 +173,7 @@ const resolvers: Resolvers = {
 	Mutation: {
 		createProject: async (
 			parent,
-			{ title, description, createdBy, frontend, backend },
+			{ title, description, createdBy, frontend, backend }: CreateProjectArgs,
 			{ currentUser }: { currentUser: User }
 		): Promise<Project> => {
 			checkLoggedInUser(currentUser);
@@ -310,7 +314,7 @@ const resolvers: Resolvers = {
 
 		createArticle: async (
 			_,
-			{ title, text, imageUrl, externalLink, createdBy }: ArticleInput,
+			{ title, text, imageUrl, externalLink, createdBy }: ArticleArgs,
 			{ currentUser }: { currentUser: User }
 		): Promise<Article> => {
 			checkLoggedInUser(currentUser);
@@ -399,7 +403,7 @@ const resolvers: Resolvers = {
 
 		linkArticleToProject: async (
 			_,
-			{ _id, projectId }: { _id: string; projectId: string },
+			{ _id, projectId }: LinkArticleToProject,
 			{ currentUser }: { currentUser: User }
 		): Promise<Article> => {
 			const session: ClientSession = await mongoose.startSession();
@@ -509,9 +513,9 @@ const resolvers: Resolvers = {
 
 		deleteArticle: async (
 			_,
-			{ _id, createdBy }: { _id: string; createdBy: string },
+			{ _id, createdBy }: DeleteDocument,
 			{ currentUser }: { currentUser: User }
-		): Promise<Article> => {
+		): Promise<void> => {
 			checkLoggedInUser(currentUser);
 
 			checkUserIsAuthor(currentUser, createdBy);
@@ -640,7 +644,7 @@ const resolvers: Resolvers = {
 
 		updatePassword: async (
 			_,
-			{ _id, oldPassword, newPassword }: { _id: string; oldPassword: string; newPassword: string },
+			{ _id, oldPassword, newPassword }: UpdatePasswordArgs,
 			{ currentUser }: { currentUser: User }
 		): Promise<User> => {
 			checkUserIsAuthor(currentUser, _id);
