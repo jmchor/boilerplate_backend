@@ -13,6 +13,9 @@ import { ArticleModel } from './models/Article.model.js';
 import { UserModel } from './models/User.model.js';
 import { KanbanModel } from './models/Kanban.model.js';
 
+import { checkLoggedInUser } from './utils/checkLoggedInUser.js';
+import { checkUserIsAuthor } from './utils/checkUserIsAuthor.js';
+
 interface LoginInput {
 	email?: string;
 	username?: string;
@@ -40,15 +43,13 @@ const resolvers: Resolvers = {
 			return populatedProjects;
 		},
 
-		findProject: async (_, { _id }, { currentUser }): Promise<Project> => {
-			if (!currentUser) {
-				throw new GraphQLError('Unauthorized', {
-					extensions: {
-						code: 'UNAUTHORIZED',
-						http: { status: 401 },
-					},
-				});
-			}
+		findProject: async (
+			_,
+			{ _id }: { _id: string },
+			{ currentUser }: { currentUser: User }
+		): Promise<Project> => {
+			checkLoggedInUser(currentUser);
+
 			const project = await ProjectModel.findById(_id);
 
 			if (!project) {
@@ -66,7 +67,7 @@ const resolvers: Resolvers = {
 				model: UserModel,
 			});
 		},
-		allArticles: async (_, args, { req }): Promise<Article[]> => {
+		allArticles: async (_, args, { req }: { req: Request }): Promise<Article[]> => {
 			if (!req.currentUser) {
 				throw new GraphQLError('Unauthorized', {
 					extensions: {
@@ -93,7 +94,7 @@ const resolvers: Resolvers = {
 
 			return populatedArticles;
 		},
-		findArticle: async (_, { _id }): Promise<Article> => {
+		findArticle: async (_, { _id }: { _id: string }): Promise<Article> => {
 			const article = await ArticleModel.findById(_id);
 
 			if (!article) {
@@ -112,14 +113,7 @@ const resolvers: Resolvers = {
 		},
 
 		currentUser: async (_, __, { currentUser }: { currentUser: User }): Promise<User> => {
-			if (!currentUser) {
-				throw new GraphQLError('Unauthorized', {
-					extensions: {
-						code: 'UNAUTHORIZED',
-						http: { status: 401 },
-					},
-				});
-			}
+			checkLoggedInUser(currentUser);
 
 			const user: User = await UserModel.findById(currentUser._id)
 				.populate({
@@ -150,14 +144,7 @@ const resolvers: Resolvers = {
 		},
 
 		myProjects: async (_, __, { currentUser }: { currentUser: User }): Promise<Project[]> => {
-			if (!currentUser) {
-				throw new GraphQLError('Unauthorized', {
-					extensions: {
-						code: 'UNAUTHORIZED',
-						http: { status: 401 },
-					},
-				});
-			}
+			checkLoggedInUser(currentUser);
 
 			const projects = await ProjectModel.find({ createdBy: currentUser._id })
 				.populate({
@@ -185,14 +172,7 @@ const resolvers: Resolvers = {
 			{ title, description, createdBy, frontend, backend },
 			{ currentUser }: { currentUser: User }
 		): Promise<Project> => {
-			if (!currentUser) {
-				throw new GraphQLError('Unauthorized', {
-					extensions: {
-						code: 'UNAUTHORIZED',
-						http: { status: 401 },
-					},
-				});
-			}
+			checkLoggedInUser(currentUser);
 
 			try {
 				const existingProject = await ProjectModel.findOne({ title });
@@ -286,25 +266,18 @@ const resolvers: Resolvers = {
 
 		editProject: async (
 			_,
-			{ _id, title, description, createdBy },
+			{
+				_id,
+				title,
+				description,
+				createdBy,
+			}: { _id: string; title: string; description: string; createdBy: string },
 			{ currentUser }: { currentUser: User }
 		): Promise<Project> => {
 			try {
-				if (!currentUser) {
-					throw new GraphQLError('You must be logged in to edit a project', {
-						extensions: {
-							code: 'UNAUTHENTICATED',
-						},
-					});
-				}
+				checkLoggedInUser(currentUser);
 
-				if (currentUser._id.toString() !== createdBy) {
-					throw new GraphQLError('You do not have permission to edit this project', {
-						extensions: {
-							code: 'UNAUTHORIZED',
-						},
-					});
-				}
+				checkUserIsAuthor(currentUser, createdBy);
 
 				if (!_id) {
 					throw new GraphQLError('Invalid project ID', {
@@ -337,16 +310,11 @@ const resolvers: Resolvers = {
 
 		createArticle: async (
 			_,
-			{ title, text, imageUrl, externalLink, createdBy },
+			{ title, text, imageUrl, externalLink, createdBy }: ArticleInput,
 			{ currentUser }: { currentUser: User }
 		): Promise<Article> => {
-			if (!currentUser) {
-				throw new GraphQLError('You must be logged in to create an article', {
-					extensions: {
-						code: 'UNAUTHENTICATED',
-					},
-				});
-			}
+			checkLoggedInUser(currentUser);
+
 			try {
 				console.log('Checking if article already exists...');
 				const existingArticle = await ArticleModel.findOne({ title });
@@ -437,13 +405,8 @@ const resolvers: Resolvers = {
 			const session: ClientSession = await mongoose.startSession();
 			session.startTransaction();
 
-			if (!currentUser) {
-				throw new GraphQLError('You must be logged in to link an article to a project', {
-					extensions: {
-						code: 'UNAUTHENTICATED',
-					},
-				});
-			}
+			checkLoggedInUser(currentUser);
+
 			try {
 				// Check if _id is valid (you might want to add more validation here)
 				if (!_id || !projectId) {
@@ -516,22 +479,8 @@ const resolvers: Resolvers = {
 			},
 			{ currentUser }: { currentUser: User }
 		): Promise<Article> => {
-			if (!currentUser) {
-				throw new GraphQLError('You must be logged in to edit an article', {
-					extensions: {
-						code: 'UNAUTHENTICATED',
-					},
-				});
-			}
-
-			// only author may edit the article
-			if (currentUser._id.toString() !== createdBy) {
-				throw new GraphQLError('You are not authorized to edit this article', {
-					extensions: {
-						code: 'UNAUTHORIZED',
-					},
-				});
-			}
+			checkLoggedInUser(currentUser);
+			checkUserIsAuthor(currentUser, createdBy);
 
 			try {
 				const article = await ArticleModel.findByIdAndUpdate(
@@ -560,10 +509,19 @@ const resolvers: Resolvers = {
 
 		deleteArticle: async (
 			_,
-			{ _id, createdBy }: { _id: string; createdBy: string }
-		): Promise<Article> => {},
+			{ _id, createdBy }: { _id: string; createdBy: string },
+			{ currentUser }: { currentUser: User }
+		): Promise<Article> => {
+			checkLoggedInUser(currentUser);
 
-		createUser: async (_, { username, email, password }): Promise<User> => {
+			checkUserIsAuthor(currentUser, createdBy);
+
+			// only author may delete the article
+			try {
+			} catch (error) {}
+		},
+
+		createUser: async (_, { username, email, password }: LoginInput): Promise<User> => {
 			try {
 				const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 				if (!emailRegex.test(email)) {
@@ -685,14 +643,7 @@ const resolvers: Resolvers = {
 			{ _id, oldPassword, newPassword }: { _id: string; oldPassword: string; newPassword: string },
 			{ currentUser }: { currentUser: User }
 		): Promise<User> => {
-			if (!currentUser || currentUser._id.toString() !== _id) {
-				throw new GraphQLError('Unauthorized To Update Password', {
-					extensions: {
-						code: 'UNAUTHORIZED',
-						http: { status: 401 },
-					},
-				});
-			}
+			checkUserIsAuthor(currentUser, _id);
 
 			const isValidPassword = compareSync(oldPassword, currentUser.passwordHash);
 
