@@ -143,6 +143,8 @@ export type Mutation = {
   deleteArticle?: Maybe<Article>;
   deleteKanban?: Maybe<Kanban>;
   deleteProject?: Maybe<Project>;
+  deleteUser?: Maybe<User>;
+  editArticle?: Maybe<Article>;
   editProject?: Maybe<Project>;
   editUser?: Maybe<User>;
   linkArticleToProject?: Maybe<Article>;
@@ -198,6 +200,22 @@ export type MutationDeleteKanbanArgs = {
 
 export type MutationDeleteProjectArgs = {
   _id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteUserArgs = {
+  _id: Scalars['ID']['input'];
+  password?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationEditArticleArgs = {
+  _id: Scalars['ID']['input'];
+  createdBy?: InputMaybe<Scalars['ID']['input']>;
+  externalLink?: InputMaybe<Scalars['String']['input']>;
+  imageUrl?: InputMaybe<Scalars['String']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -491,6 +509,8 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   deleteArticle?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType, RequireFields<MutationDeleteArticleArgs, '_id'>>;
   deleteKanban?: Resolver<Maybe<ResolversTypes['Kanban']>, ParentType, ContextType, RequireFields<MutationDeleteKanbanArgs, '_id'>>;
   deleteProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<MutationDeleteProjectArgs, '_id'>>;
+  deleteUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationDeleteUserArgs, '_id'>>;
+  editArticle?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType, RequireFields<MutationEditArticleArgs, '_id'>>;
   editProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<MutationEditProjectArgs, '_id'>>;
   editUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationEditUserArgs, '_id'>>;
   linkArticleToProject?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType, RequireFields<MutationLinkArticleToProjectArgs, '_id' | 'projectId'>>;
