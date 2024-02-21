@@ -448,6 +448,67 @@ const resolvers: Resolvers = {
 			}
 		},
 
+		editArticle: async (
+			_,
+			{
+				_id,
+				title,
+				text,
+				imageUrl,
+				externalLink,
+				createdBy,
+			}: {
+				_id: string;
+				title: string;
+				text: string;
+				imageUrl: string;
+				externalLink: string;
+				createdBy: string;
+			},
+			{ currentUser }: { currentUser: User }
+		): Promise<Article> => {
+			if (!currentUser) {
+				throw new GraphQLError('You must be logged in to edit an article', {
+					extensions: {
+						code: 'UNAUTHENTICATED',
+					},
+				});
+			}
+
+			// only author may edit the article
+			if (currentUser._id.toString() !== createdBy) {
+				throw new GraphQLError('You are not authorized to edit this article', {
+					extensions: {
+						code: 'UNAUTHORIZED',
+					},
+				});
+			}
+
+			try {
+				const article = await ArticleModel.findByIdAndUpdate(
+					_id,
+					{
+						title,
+						text,
+						imageUrl,
+						externalLink,
+					},
+					{ new: true }
+				);
+				return article.populate({
+					path: 'createdBy',
+					model: UserModel,
+				});
+			} catch (error) {
+				throw new GraphQLError('Failed to edit article', {
+					extensions: {
+						code: 'INTERNAL_SERVER_ERROR',
+						invalidArgs: _id,
+					},
+				});
+			}
+		},
+
 		createUser: async (_, { username, email, password }): Promise<User> => {
 			try {
 				const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -684,3 +745,11 @@ const resolvers: Resolvers = {
 };
 
 export default resolvers;
+
+// {
+// 	"title": "A test article for Editing",
+// 	"text": "For editing",
+// 	"createdBy": "65d4a5e9bec4ced2705ecf0c",
+// 	"imageUrl": "",
+// 	"externalLink": ""
+//   }
