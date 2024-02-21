@@ -431,10 +431,19 @@ const resolvers: Resolvers = {
 
 		linkArticleToProject: async (
 			_,
-			{ _id, projectId }: { _id: string; projectId: string }
+			{ _id, projectId }: { _id: string; projectId: string },
+			{ currentUser }: { currentUser: User }
 		): Promise<Article> => {
 			const session: ClientSession = await mongoose.startSession();
 			session.startTransaction();
+
+			if (!currentUser) {
+				throw new GraphQLError('You must be logged in to link an article to a project', {
+					extensions: {
+						code: 'UNAUTHENTICATED',
+					},
+				});
+			}
 			try {
 				// Check if _id is valid (you might want to add more validation here)
 				if (!_id || !projectId) {
