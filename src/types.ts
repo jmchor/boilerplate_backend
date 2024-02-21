@@ -190,6 +190,7 @@ export type MutationCreateUserArgs = {
 
 export type MutationDeleteArticleArgs = {
   _id: Scalars['ID']['input'];
+  createdBy?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -200,6 +201,7 @@ export type MutationDeleteKanbanArgs = {
 
 export type MutationDeleteProjectArgs = {
   _id: Scalars['ID']['input'];
+  createdBy?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -221,6 +223,7 @@ export type MutationEditArticleArgs = {
 
 export type MutationEditProjectArgs = {
   _id: Scalars['ID']['input'];
+  createdBy?: InputMaybe<Scalars['ID']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
 };
