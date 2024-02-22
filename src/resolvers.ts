@@ -321,30 +321,6 @@ const resolvers: Resolvers = {
 					throw new GraphQLError(`Article with title ${title} already exists`);
 				}
 
-				switch (true) {
-					case typeof text !== 'string':
-						throw new GraphQLError('Text must be a string', {
-							extensions: { code: 'INVALID_INPUT', invalidArgs: text },
-						});
-					case typeof title !== 'string':
-						throw new GraphQLError('Title must be a string', {
-							extensions: { code: 'INVALID_INPUT', invalidArgs: title },
-						});
-					case typeof imageUrl !== 'string':
-						throw new GraphQLError('ImageUrl must be a string', {
-							extensions: { code: 'INVALID_INPUT', invalidArgs: imageUrl },
-						});
-					case typeof externalLink !== 'string':
-						throw new GraphQLError('ExternalLink must be a string', {
-							extensions: {
-								code: 'INVALID_INPUT',
-								invalidArgs: externalLink,
-							},
-						});
-					default:
-						break;
-				}
-
 				let defaultImage: string;
 
 				if (imageUrl === '') {
@@ -576,14 +552,8 @@ const resolvers: Resolvers = {
 			{ _id, username, email }: EditUserArgs,
 			{ currentUser }: UserContext
 		): Promise<User> => {
-			if (!currentUser || currentUser._id.toString() !== _id) {
-				throw new GraphQLError('Unauthorized To Edit', {
-					extensions: {
-						code: 'UNAUTHORIZED',
-						http: { status: 401 },
-					},
-				});
-			}
+			checkLoggedInUser(currentUser);
+			checkUserIsAuthor(currentUser, _id);
 
 			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 			if (!emailRegex.test(email)) {
