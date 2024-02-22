@@ -198,15 +198,15 @@ const typeDefs = gql`
 		): Project
 		addInstallScript(_id: ID!): Project
 
-		editProject(_id: ID!, title: String, description: String, createdBy: ID): Project
+		editProject(_id: ID!, title: String, description: String, createdBy: ID!): Project
 
-		deleteProject(_id: ID!, createdBy: ID): Boolean
+		deleteProject(_id: ID!, createdBy: ID!): Boolean
 
-		deleteArticle(_id: ID!, createdBy: ID): Boolean
+		deleteArticle(_id: ID!, createdBy: ID!): Boolean
 
-		deleteKanban(_id: ID!, createdBy: ID): Boolean
+		deleteKanban(_id: ID!, createdBy: ID!): Boolean
 
-		deleteUser(_id: ID!, password: String): Boolean
+		deleteUser(_id: ID!, password: String!): Boolean
 
 		createArticle(
 			title: String!
@@ -225,7 +225,7 @@ const typeDefs = gql`
 			text: String
 			imageUrl: String
 			externalLink: String
-			createdBy: ID
+			createdBy: ID!
 		): Article
 
 		createUser(username: String!, email: String!, password: String!): User

@@ -190,31 +190,31 @@ export type MutationCreateUserArgs = {
 
 export type MutationDeleteArticleArgs = {
   _id: Scalars['ID']['input'];
-  createdBy?: InputMaybe<Scalars['ID']['input']>;
+  createdBy: Scalars['ID']['input'];
 };
 
 
 export type MutationDeleteKanbanArgs = {
   _id: Scalars['ID']['input'];
-  createdBy?: InputMaybe<Scalars['ID']['input']>;
+  createdBy: Scalars['ID']['input'];
 };
 
 
 export type MutationDeleteProjectArgs = {
   _id: Scalars['ID']['input'];
-  createdBy?: InputMaybe<Scalars['ID']['input']>;
+  createdBy: Scalars['ID']['input'];
 };
 
 
 export type MutationDeleteUserArgs = {
   _id: Scalars['ID']['input'];
-  password?: InputMaybe<Scalars['String']['input']>;
+  password: Scalars['String']['input'];
 };
 
 
 export type MutationEditArticleArgs = {
   _id: Scalars['ID']['input'];
-  createdBy?: InputMaybe<Scalars['ID']['input']>;
+  createdBy: Scalars['ID']['input'];
   externalLink?: InputMaybe<Scalars['String']['input']>;
   imageUrl?: InputMaybe<Scalars['String']['input']>;
   text?: InputMaybe<Scalars['String']['input']>;
@@ -224,7 +224,7 @@ export type MutationEditArticleArgs = {
 
 export type MutationEditProjectArgs = {
   _id: Scalars['ID']['input'];
-  createdBy?: InputMaybe<Scalars['ID']['input']>;
+  createdBy: Scalars['ID']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
 };
@@ -510,12 +510,12 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createArticle?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType, RequireFields<MutationCreateArticleArgs, 'createdBy' | 'text' | 'title'>>;
   createProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'backend' | 'createdBy' | 'frontend' | 'title'>>;
   createUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'email' | 'password' | 'username'>>;
-  deleteArticle?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteArticleArgs, '_id'>>;
-  deleteKanban?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteKanbanArgs, '_id'>>;
-  deleteProject?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteProjectArgs, '_id'>>;
-  deleteUser?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteUserArgs, '_id'>>;
-  editArticle?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType, RequireFields<MutationEditArticleArgs, '_id'>>;
-  editProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<MutationEditProjectArgs, '_id'>>;
+  deleteArticle?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteArticleArgs, '_id' | 'createdBy'>>;
+  deleteKanban?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteKanbanArgs, '_id' | 'createdBy'>>;
+  deleteProject?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteProjectArgs, '_id' | 'createdBy'>>;
+  deleteUser?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteUserArgs, '_id' | 'password'>>;
+  editArticle?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType, RequireFields<MutationEditArticleArgs, '_id' | 'createdBy'>>;
+  editProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<MutationEditProjectArgs, '_id' | 'createdBy'>>;
   editUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationEditUserArgs, '_id'>>;
   linkArticleToProject?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType, RequireFields<MutationLinkArticleToProjectArgs, '_id' | 'projectId'>>;
   login?: Resolver<Maybe<ResolversTypes['Token']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'input'>>;

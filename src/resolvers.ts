@@ -579,15 +579,7 @@ const resolvers: Resolvers = {
 			checkLoggedInUser(currentUser);
 			checkUserIsAuthor(currentUser, _id);
 
-			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-			if (!emailRegex.test(email)) {
-				throw new GraphQLError('Email address is malformed', {
-					extensions: {
-						code: 'INVALID_INPUT',
-						invalidArgs: email,
-					},
-				});
-			}
+			inputRegex(email, 'email');
 
 			try {
 				const existingEmail = await UserModel.findOne({ email });
