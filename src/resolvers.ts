@@ -1,33 +1,36 @@
 import { GraphQLError } from 'graphql';
-import { genSaltSync, hashSync, compareSync } from 'bcrypt-ts';
+import { genSaltSync, hashSync } from 'bcrypt-ts';
 import mongoose, { ClientSession } from 'mongoose';
-
 import jwt from 'jsonwebtoken';
 import cookie from 'cookie';
-import express, { Request, Response } from 'express';
-import { Article, Project, Resolvers, Token, User } from './types.js';
+import express from 'express';
 
-import { generateInstallCommands } from './scripts/installCommands.js';
 import { ProjectModel } from './models/Project.model.js';
 import { ArticleModel } from './models/Article.model.js';
 import { UserModel } from './models/User.model.js';
 import { KanbanModel } from './models/Kanban.model.js';
 
-import { checkLoggedInUser } from './utils/checkLoggedInUser.js';
-import { checkUserIsAuthor } from './utils/checkUserIsAuthor.js';
-
+import { Article, Project, Resolvers, Token, User } from './types.js';
 import {
 	BaseArgs,
 	CreateProjectArgs,
 	ArticleArgs,
 	DeleteDocument,
+	DeleteUser,
 	LinkArticleToProject,
 	LoginInput,
 	UpdatePasswordArgs,
 	EditProjectArgs,
 	EditUserArgs,
 	UserContext,
+	ReqResContext,
 } from './types/argTypes.js';
+
+import { generateInstallCommands } from './scripts/installCommands.js';
+import { checkLoggedInUser } from './utils/checkLoggedInUser.js';
+import { checkUserIsAuthor } from './utils/checkUserIsAuthor.js';
+import { passwordValidation } from './utils/passwordValidation.js';
+import { inputRegex } from './utils/passwordRegex.js';
 
 const resolvers: Resolvers = {
 	Query: {
@@ -70,7 +73,7 @@ const resolvers: Resolvers = {
 				model: UserModel,
 			});
 		},
-		allArticles: async (_, args, { req }: { req: Request }): Promise<Article[]> => {
+		allArticles: async (_, args, { req }: ReqResContext): Promise<Article[]> => {
 			if (!req.currentUser) {
 				throw new GraphQLError('Unauthorized', {
 					extensions: {
@@ -491,29 +494,9 @@ const resolvers: Resolvers = {
 
 		createUser: async (_, { username, email, password }: LoginInput): Promise<User> => {
 			try {
-				const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-				if (!emailRegex.test(email)) {
-					throw new GraphQLError('Email address is malformed', {
-						extensions: {
-							code: 'INVALID_INPUT',
-							invalidArgs: email,
-						},
-					});
-				}
+				inputRegex(email, 'email');
 
-				const passwordRegex =
-					/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?-]).{6,}/;
-				if (!passwordRegex.test(password)) {
-					throw new GraphQLError(
-						'Password must be at least 6 characters long, and must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
-						{
-							extensions: {
-								code: 'INVALID_INPUT',
-								invalidArgs: password,
-							},
-						}
-					);
-				}
+				inputRegex(password, 'password');
 
 				const existingEmail = await UserModel.findOne({ email });
 
@@ -607,30 +590,9 @@ const resolvers: Resolvers = {
 		): Promise<User> => {
 			checkUserIsAuthor(currentUser, _id);
 
-			const isValidPassword = compareSync(oldPassword, currentUser.passwordHash);
+			passwordValidation(oldPassword, currentUser.passwordHash);
 
-			if (!isValidPassword) {
-				throw new GraphQLError('Invalid password', {
-					extensions: {
-						code: 'INVALID_INPUT',
-						invalidArgs: oldPassword,
-					},
-				});
-			}
-
-			const passwordRegex =
-				/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?-]).{6,}/;
-			if (!passwordRegex.test(newPassword)) {
-				throw new GraphQLError(
-					'Password must be at least 6 characters long, and must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
-					{
-						extensions: {
-							code: 'INVALID_INPUT',
-							invalidArgs: newPassword,
-						},
-					}
-				);
-			}
+			inputRegex(newPassword, 'password');
 
 			const salt = genSaltSync(10);
 			const hashedPassword = hashSync(newPassword, salt);
@@ -648,11 +610,29 @@ const resolvers: Resolvers = {
 			return updateUser;
 		},
 
-		login: async (
+		deleteUser: async (
 			_,
-			{ input }: { input: LoginInput },
-			{ res, req }: { res: Response; req: Request }
-		): Promise<Token> => {
+			{ _id, password }: DeleteUser,
+			{ currentUser }: UserContext
+		): Promise<boolean> => {
+			checkLoggedInUser(currentUser);
+			passwordValidation(password, currentUser.passwordHash);
+
+			try {
+				await UserModel.findByIdAndDelete(_id);
+			} catch (error) {
+				throw new GraphQLError('Failed to delete user', {
+					extensions: {
+						code: 'INTERNAL_SERVER_ERROR',
+						invalidArgs: _id,
+					},
+				});
+			}
+
+			return true;
+		},
+
+		login: async (_, { input }: { input: LoginInput }, { res, req }: ReqResContext): Promise<Token> => {
 			const { email, username, password } = input;
 			const secretKey: string = process.env.JWT_SECRET;
 			let user: User;
@@ -672,16 +652,7 @@ const resolvers: Resolvers = {
 				});
 			}
 
-			const isValidPassword = compareSync(password, user.passwordHash);
-
-			if (!isValidPassword) {
-				throw new GraphQLError('Invalid password', {
-					extensions: {
-						code: 'INVALID_INPUT',
-						invalidArgs: password,
-					},
-				});
-			}
+			passwordValidation(password, user.passwordHash);
 
 			const token = jwt.sign({ userId: user._id }, secretKey, {
 				expiresIn: '1d',
@@ -699,7 +670,7 @@ const resolvers: Resolvers = {
 
 		// TODO testing
 		// eslint-disable-next-line @typescript-eslint/require-await
-		logout: async (_, __, { res }): Promise<boolean> => {
+		logout: async (_, __, { res }: ReqResContext): Promise<boolean> => {
 			res.clearCookie('token', {
 				httpOnly: true,
 				expires: new Date(0),
