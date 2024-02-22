@@ -1,7 +1,7 @@
-import { BackendConfig, FrontendConfig } from '../types';
+import { BackendConfig, FrontendConfig, User } from '../types';
 
 interface BaseArgs {
-	_id?: string;
+	_id: string;
 }
 
 interface EditProjectArgs extends BaseArgs {
@@ -47,6 +47,10 @@ interface UpdatePasswordArgs extends BaseArgs {
 	newPassword: string;
 }
 
+interface UserContext {
+	currentUser: User;
+}
+
 export {
 	BaseArgs,
 	EditProjectArgs,
@@ -57,4 +61,5 @@ export {
 	LoginInput,
 	EditUserArgs,
 	UpdatePasswordArgs,
+	UserContext,
 };
