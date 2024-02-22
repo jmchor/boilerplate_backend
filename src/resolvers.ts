@@ -332,6 +332,24 @@ const resolvers: Resolvers = {
 			}
 		},
 
+		deleteKanban: async (_, { _id, createdBy }: DeleteDocument, { currentUser }: UserContext) => {
+			checkLoggedInUser(currentUser);
+			checkUserIsAuthor(currentUser, createdBy);
+
+			try {
+				await KanbanModel.findByIdAndDelete(_id);
+				return true;
+			} catch (error) {
+				throw new GraphQLError('Failed to delete kanban', {
+					extensions: {
+						code: 'INTERNAL_SERVER_ERROR',
+						invalidArgs: _id,
+					},
+				});
+				return false;
+			}
+		},
+
 		createArticle: async (
 			_,
 			{ title, text, imageUrl, externalLink, createdBy }: ArticleArgs,
