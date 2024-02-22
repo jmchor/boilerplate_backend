@@ -4,19 +4,6 @@ import { ProjectModel } from './Project.model.js';
 import { ArticleModel } from './Article.model.js';
 import { User } from '../types.js';
 
-// interface Articles {
-// 	authored: (mongoose.Types.ObjectId | string | null)[];
-// 	liked: (mongoose.Types.ObjectId | string | null)[];
-// }
-
-// export interface UserDocument extends Document {
-// 	username: string;
-// 	email: string;
-// 	passwordHash: string;
-// 	projects?: (mongoose.Types.ObjectId | string | null)[];
-// 	articles?: Articles[];
-// }
-
 const userSchema = new Schema<User>(
 	{
 		username: {

@@ -3,15 +3,6 @@ import { ProjectModel } from './Project.model.js';
 import { UserModel } from './User.model.js';
 import { Kanban } from '../types.js';
 
-// export interface KanbanDocument extends Document {
-// 	backlog: string[];
-// 	todo: string[];
-// 	doing: string[];
-// 	done: string[];
-// 	project: mongoose.Types.ObjectId | string | null;
-// 	createdBy: mongoose.Types.ObjectId | string | null;
-// }
-
 const kanbanSchema = new Schema<Kanban>({
 	backlog: {
 		type: [String],

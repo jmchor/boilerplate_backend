@@ -1,29 +1,11 @@
-import mongoose, { Schema, model, Model } from 'mongoose';
+import { Schema, model, Model } from 'mongoose';
 import { KanbanModel } from './Kanban.model.js';
 
-import { FrontendConfig, BackendConfig, Project } from '../types.js';
+import { Project } from '../types.js';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { UserModel } from './User.model.js';
 import { ArticleModel } from './Article.model.js';
 
-// // Define interface for Project document
-// export interface ProjectDocument extends Document {
-// 	_id?: mongoose.Types.ObjectId;
-// 	title: string;
-// 	description?: string;
-// 	createdBy: string | mongoose.Types.ObjectId;
-
-// 	frontend: FrontendConfig;
-// 	backend: BackendConfig;
-// 	installScripts?: {
-// 		frontend?: string;
-// 		backend?: string;
-// 	};
-// 	kanban?: mongoose.Types.ObjectId | string | null; // Reference to Kanban model
-// 	articles?: (mongoose.Types.ObjectId | string)[]; // Array of references to Article model
-// }
-
-// Define mongoose schema for Project
 const projectSchema = new Schema<Project>(
 	{
 		title: {
