@@ -200,9 +200,9 @@ const typeDefs = gql`
 
 		editProject(_id: ID!, title: String, description: String, createdBy: ID): Project
 
-		deleteProject(_id: ID!, createdBy: ID): Project
+		deleteProject(_id: ID!, createdBy: ID): Boolean
 
-		deleteArticle(_id: ID!, createdBy: ID): Article
+		deleteArticle(_id: ID!, createdBy: ID): Boolean
 
 		deleteKanban(_id: ID!): Kanban
 
