@@ -204,9 +204,9 @@ const typeDefs = gql`
 
 		deleteArticle(_id: ID!, createdBy: ID): Boolean
 
-		deleteKanban(_id: ID!): Kanban
+		deleteKanban(_id: ID!, createdBy: ID): Boolean
 
-		deleteUser(_id: ID!, password: String): User
+		deleteUser(_id: ID!, password: String): Boolean
 
 		createArticle(
 			title: String!

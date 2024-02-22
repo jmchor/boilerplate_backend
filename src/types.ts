@@ -141,9 +141,9 @@ export type Mutation = {
   createProject?: Maybe<Project>;
   createUser?: Maybe<User>;
   deleteArticle?: Maybe<Scalars['Boolean']['output']>;
-  deleteKanban?: Maybe<Kanban>;
+  deleteKanban?: Maybe<Scalars['Boolean']['output']>;
   deleteProject?: Maybe<Scalars['Boolean']['output']>;
-  deleteUser?: Maybe<User>;
+  deleteUser?: Maybe<Scalars['Boolean']['output']>;
   editArticle?: Maybe<Article>;
   editProject?: Maybe<Project>;
   editUser?: Maybe<User>;
@@ -196,6 +196,7 @@ export type MutationDeleteArticleArgs = {
 
 export type MutationDeleteKanbanArgs = {
   _id: Scalars['ID']['input'];
+  createdBy?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -510,9 +511,9 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'backend' | 'createdBy' | 'frontend' | 'title'>>;
   createUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'email' | 'password' | 'username'>>;
   deleteArticle?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteArticleArgs, '_id'>>;
-  deleteKanban?: Resolver<Maybe<ResolversTypes['Kanban']>, ParentType, ContextType, RequireFields<MutationDeleteKanbanArgs, '_id'>>;
+  deleteKanban?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteKanbanArgs, '_id'>>;
   deleteProject?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteProjectArgs, '_id'>>;
-  deleteUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationDeleteUserArgs, '_id'>>;
+  deleteUser?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteUserArgs, '_id'>>;
   editArticle?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType, RequireFields<MutationEditArticleArgs, '_id'>>;
   editProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<MutationEditProjectArgs, '_id'>>;
   editUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationEditUserArgs, '_id'>>;

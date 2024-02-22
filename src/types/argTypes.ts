@@ -1,21 +1,22 @@
+import { Request, Response } from 'express';
 import { BackendConfig, FrontendConfig, User } from '../types';
 
-interface BaseArgs {
+export interface BaseArgs {
 	_id: string;
 }
 
-interface EditProjectArgs extends BaseArgs {
+export interface EditProjectArgs extends BaseArgs {
 	title: string;
 	description: string;
 	createdBy: string;
 }
 
-interface CreateProjectArgs extends EditProjectArgs {
+export interface CreateProjectArgs extends EditProjectArgs {
 	frontend: FrontendConfig;
 	backend: BackendConfig;
 }
 
-interface ArticleArgs extends BaseArgs {
+export interface ArticleArgs extends BaseArgs {
 	title: string;
 	text: string;
 	imageUrl: string;
@@ -23,43 +24,43 @@ interface ArticleArgs extends BaseArgs {
 	createdBy: string;
 }
 
-interface DeleteDocument extends BaseArgs {
+export interface DeleteDocument extends BaseArgs {
 	createdBy: string;
 }
 
-interface LinkArticleToProject extends BaseArgs {
+export interface DeleteUser extends BaseArgs {
+	password: string;
+}
+
+export interface LinkArticleToProject extends BaseArgs {
 	projectId: string;
 }
 
-interface LoginInput {
+export interface LoginInput {
 	email?: string;
 	username?: string;
 	password: string;
 }
 
-interface EditUserArgs extends BaseArgs {
+export interface EditUserArgs extends BaseArgs {
 	username: string;
 	email: string;
 }
 
-interface UpdatePasswordArgs extends BaseArgs {
+export interface UpdatePasswordArgs extends BaseArgs {
 	oldPassword: string;
 	newPassword: string;
 }
 
-interface UserContext {
+export interface UserContext {
 	currentUser: User;
 }
 
-export {
-	BaseArgs,
-	EditProjectArgs,
-	CreateProjectArgs,
-	ArticleArgs,
-	DeleteDocument,
-	LinkArticleToProject,
-	LoginInput,
-	EditUserArgs,
-	UpdatePasswordArgs,
-	UserContext,
-};
+export interface Token {
+	token: string;
+}
+
+export interface ReqResContext {
+	req: Response;
+	res: Request;
+}
