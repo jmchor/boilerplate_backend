@@ -309,6 +309,29 @@ const resolvers: Resolvers = {
 			}
 		},
 
+		deleteProject: async (
+			_,
+			{ _id, createdBy }: DeleteDocument,
+			{ currentUser }: UserContext
+		): Promise<boolean> => {
+			checkLoggedInUser(currentUser);
+			checkUserIsAuthor(currentUser, createdBy);
+
+			try {
+				await ProjectModel.findByIdAndDelete(_id);
+				return true;
+			} catch (error) {
+				throw new GraphQLError('Failed to delete project', {
+					extensions: {
+						code: 'INTERNAL_SERVER_ERROR',
+						invalidArgs: _id,
+					},
+				});
+
+				return false;
+			}
+		},
+
 		createArticle: async (
 			_,
 			{ title, text, imageUrl, externalLink, createdBy }: ArticleArgs,
