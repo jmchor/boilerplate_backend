@@ -24,6 +24,9 @@ import {
 	LinkArticleToProject,
 	LoginInput,
 	UpdatePasswordArgs,
+	EditProjectArgs,
+	EditUserArgs,
+	UserContext,
 } from './types/argTypes.js';
 
 const resolvers: Resolvers = {
@@ -47,11 +50,7 @@ const resolvers: Resolvers = {
 			return populatedProjects;
 		},
 
-		findProject: async (
-			_,
-			{ _id }: { _id: string },
-			{ currentUser }: { currentUser: User }
-		): Promise<Project> => {
+		findProject: async (_, { _id }: BaseArgs, { currentUser }: UserContext): Promise<Project> => {
 			checkLoggedInUser(currentUser);
 
 			const project = await ProjectModel.findById(_id);
@@ -116,7 +115,7 @@ const resolvers: Resolvers = {
 			});
 		},
 
-		currentUser: async (_, __, { currentUser }: { currentUser: User }): Promise<User> => {
+		currentUser: async (_, __, { currentUser }: UserContext): Promise<User> => {
 			checkLoggedInUser(currentUser);
 
 			const user: User = await UserModel.findById(currentUser._id)
@@ -147,7 +146,7 @@ const resolvers: Resolvers = {
 			return user;
 		},
 
-		myProjects: async (_, __, { currentUser }: { currentUser: User }): Promise<Project[]> => {
+		myProjects: async (_, __, { currentUser }: UserContext): Promise<Project[]> => {
 			checkLoggedInUser(currentUser);
 
 			const projects = await ProjectModel.find({ createdBy: currentUser._id })
@@ -174,7 +173,7 @@ const resolvers: Resolvers = {
 		createProject: async (
 			parent,
 			{ title, description, createdBy, frontend, backend }: CreateProjectArgs,
-			{ currentUser }: { currentUser: User }
+			{ currentUser }: UserContext
 		): Promise<Project> => {
 			checkLoggedInUser(currentUser);
 
@@ -270,13 +269,8 @@ const resolvers: Resolvers = {
 
 		editProject: async (
 			_,
-			{
-				_id,
-				title,
-				description,
-				createdBy,
-			}: { _id: string; title: string; description: string; createdBy: string },
-			{ currentUser }: { currentUser: User }
+			{ _id, title, description, createdBy }: EditProjectArgs,
+			{ currentUser }: UserContext
 		): Promise<Project> => {
 			try {
 				checkLoggedInUser(currentUser);
@@ -315,7 +309,7 @@ const resolvers: Resolvers = {
 		createArticle: async (
 			_,
 			{ title, text, imageUrl, externalLink, createdBy }: ArticleArgs,
-			{ currentUser }: { currentUser: User }
+			{ currentUser }: UserContext
 		): Promise<Article> => {
 			checkLoggedInUser(currentUser);
 
@@ -404,7 +398,7 @@ const resolvers: Resolvers = {
 		linkArticleToProject: async (
 			_,
 			{ _id, projectId }: LinkArticleToProject,
-			{ currentUser }: { currentUser: User }
+			{ currentUser }: UserContext
 		): Promise<Article> => {
 			const session: ClientSession = await mongoose.startSession();
 			session.startTransaction();
@@ -466,22 +460,8 @@ const resolvers: Resolvers = {
 
 		editArticle: async (
 			_,
-			{
-				_id,
-				title,
-				text,
-				imageUrl,
-				externalLink,
-				createdBy,
-			}: {
-				_id: string;
-				title: string;
-				text: string;
-				imageUrl: string;
-				externalLink: string;
-				createdBy: string;
-			},
-			{ currentUser }: { currentUser: User }
+			{ _id, title, text, imageUrl, externalLink, createdBy }: ArticleArgs,
+			{ currentUser }: UserContext
 		): Promise<Article> => {
 			checkLoggedInUser(currentUser);
 			checkUserIsAuthor(currentUser, createdBy);
@@ -514,15 +494,23 @@ const resolvers: Resolvers = {
 		deleteArticle: async (
 			_,
 			{ _id, createdBy }: DeleteDocument,
-			{ currentUser }: { currentUser: User }
-		): Promise<void> => {
+			{ currentUser }: UserContext
+		): Promise<boolean> => {
 			checkLoggedInUser(currentUser);
-
 			checkUserIsAuthor(currentUser, createdBy);
 
-			// only author may delete the article
 			try {
-			} catch (error) {}
+				await ArticleModel.findByIdAndDelete(_id);
+				return true;
+			} catch (error) {
+				throw new GraphQLError('Failed to delete article', {
+					extensions: {
+						code: 'INTERNAL_SERVER_ERROR',
+						invalidArgs: _id,
+					},
+				});
+				return false;
+			}
 		},
 
 		createUser: async (_, { username, email, password }: LoginInput): Promise<User> => {
@@ -585,8 +573,8 @@ const resolvers: Resolvers = {
 
 		editUser: async (
 			_,
-			{ _id, username, email }: { _id: string; username: string; email: string },
-			{ currentUser }: { currentUser: User }
+			{ _id, username, email }: EditUserArgs,
+			{ currentUser }: UserContext
 		): Promise<User> => {
 			if (!currentUser || currentUser._id.toString() !== _id) {
 				throw new GraphQLError('Unauthorized To Edit', {
@@ -645,7 +633,7 @@ const resolvers: Resolvers = {
 		updatePassword: async (
 			_,
 			{ _id, oldPassword, newPassword }: UpdatePasswordArgs,
-			{ currentUser }: { currentUser: User }
+			{ currentUser }: UserContext
 		): Promise<User> => {
 			checkUserIsAuthor(currentUser, _id);
 
