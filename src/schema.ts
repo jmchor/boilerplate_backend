@@ -1,4 +1,5 @@
 import gql from 'graphql-tag';
+import { Database, BackendConfig } from './types';
 
 const typeDefs = gql`
 	# enums
@@ -61,6 +62,28 @@ const typeDefs = gql`
 		typesExpress
 	}
 
+	enum Tags {
+		database
+		backend
+		frontend
+		wordpress
+		keystone
+		technical_writing
+		blog
+		graphql
+		validation
+		tests
+		no_sql
+		sql
+		misc
+		react
+		typescript
+		programming
+		software_engineering
+		wiki
+		deployment
+	}
+
 	type User {
 		username: String!
 		email: String!
@@ -74,6 +97,7 @@ const typeDefs = gql`
 	type Article {
 		title: String!
 		text: String!
+		tags: [Tags]
 		imageUrl: String
 		externalLink: String
 		linkedProjects: [Project]
@@ -145,6 +169,7 @@ const typeDefs = gql`
 	input ArticleInput {
 		title: String!
 		text: String!
+		tags: [Tags]
 		imageUrl: String
 		externalLink: String
 		linkedProjects: [ID]
@@ -211,6 +236,7 @@ const typeDefs = gql`
 		createArticle(
 			title: String!
 			text: String!
+			tags: [Tags]
 			imageUrl: String
 			externalLink: String
 			linkedProjects: [ID]
@@ -223,6 +249,7 @@ const typeDefs = gql`
 			_id: ID!
 			title: String
 			text: String
+			tags: [Tags]
 			imageUrl: String
 			externalLink: String
 			createdBy: ID!
