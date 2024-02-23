@@ -16,11 +16,22 @@ export interface CreateProjectArgs extends EditProjectArgs {
 	backend: BackendConfig;
 }
 
-export interface ArticleArgs extends BaseArgs {
+export interface CreateArticleArgs {
 	title: string;
 	text: string;
-	imageUrl: string;
-	externalLink: string;
+	tags?: string[];
+	imageUrl?: string;
+	externalLink?: string;
+	createdBy: string;
+}
+
+export interface EditArticleArgs {
+	_id: string;
+	title?: string;
+	text?: string;
+	tags?: string[];
+	imageUrl?: string;
+	externalLink?: string;
 	createdBy: string;
 }
 
