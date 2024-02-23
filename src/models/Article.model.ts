@@ -21,6 +21,33 @@ const articleSchema = new Schema<Article>(
 		externalLink: {
 			type: String,
 		},
+
+		tags: [
+			{
+				type: String,
+				enum: [
+					'database',
+					'backend',
+					'frontend',
+					'wordpress',
+					'keystone',
+					'technical_writing',
+					'blog',
+					'graphql',
+					'validation',
+					'tests',
+					'no_sql',
+					'sql',
+					'misc',
+					'react',
+					'typescript',
+					'programming',
+					'software_engineering',
+					'wiki',
+					'deployment',
+				],
+			},
+		],
 		createdBy: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'UserModel',
