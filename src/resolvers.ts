@@ -14,7 +14,8 @@ import { Article, Project, Resolvers, Token, User } from './types.js';
 import {
 	BaseArgs,
 	CreateProjectArgs,
-	ArticleArgs,
+	CreateArticleArgs,
+	EditArticleArgs,
 	DeleteDocument,
 	DeleteUser,
 	LinkArticleToProject,
@@ -352,7 +353,7 @@ const resolvers: Resolvers = {
 
 		createArticle: async (
 			_,
-			{ title, text, imageUrl, externalLink, createdBy }: ArticleArgs,
+			{ title, text, tags, imageUrl, externalLink, createdBy }: CreateArticleArgs,
 			{ currentUser }: UserContext
 		): Promise<Article> => {
 			checkLoggedInUser(currentUser);
@@ -377,6 +378,7 @@ const resolvers: Resolvers = {
 				const newArticleData = {
 					title,
 					text,
+					tags,
 					imageUrl: defaultImage,
 					externalLink,
 					createdBy,
@@ -406,6 +408,7 @@ const resolvers: Resolvers = {
 						code: 'INTERNAL_SERVER_ERROR',
 						invalidArgs: title,
 						text,
+						tags,
 						imageUrl,
 						externalLink,
 						createdBy,
@@ -480,7 +483,7 @@ const resolvers: Resolvers = {
 
 		editArticle: async (
 			_,
-			{ _id, title, text, imageUrl, externalLink, createdBy }: ArticleArgs,
+			{ _id, title, text, tags, imageUrl, externalLink, createdBy }: EditArticleArgs,
 			{ currentUser }: UserContext
 		): Promise<Article> => {
 			checkLoggedInUser(currentUser);
@@ -492,6 +495,7 @@ const resolvers: Resolvers = {
 					{
 						title,
 						text,
+						tags,
 						imageUrl,
 						externalLink,
 					},
@@ -716,11 +720,3 @@ const resolvers: Resolvers = {
 };
 
 export default resolvers;
-
-// {
-// 	"title": "A test article for Editing",
-// 	"text": "For editing",
-// 	"createdBy": "65d4a5e9bec4ced2705ecf0c",
-// 	"imageUrl": "",
-// 	"externalLink": ""
-//   }
