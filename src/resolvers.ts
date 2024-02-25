@@ -10,7 +10,7 @@ import { ArticleModel } from './models/Article.model.js';
 import { UserModel } from './models/User.model.js';
 import { KanbanModel } from './models/Kanban.model.js';
 
-import { Article, Project, Resolvers, Token, User } from './types.js';
+import { Article, LogoutResponse, Project, Resolvers, Token, User } from './types.js';
 import {
 	BaseArgs,
 	CreateProjectArgs,
@@ -119,7 +119,8 @@ const resolvers: Resolvers = {
 			});
 		},
 
-		currentUser: async (_, __, { currentUser }: UserContext): Promise<User> => {
+		currentUser: async (_, __, { req }: ReqResContext): Promise<User> => {
+			const { currentUser } = req;
 			checkLoggedInUser(currentUser);
 
 			const user: User = await UserModel.findById(currentUser._id)
@@ -144,8 +145,6 @@ const resolvers: Resolvers = {
 					},
 				});
 			}
-
-			console.log(user);
 
 			return user;
 		},
@@ -669,14 +668,26 @@ const resolvers: Resolvers = {
 			return true;
 		},
 
-		login: async (_, { input }: { input: LoginInput }, { res, req }: ReqResContext): Promise<Token> => {
-			const { email, username, password } = input;
+		login: async (
+			_,
+			{ credentials }: { credentials: LoginInput },
+			{ res, req }: ReqResContext
+		): Promise<Token> => {
+			const { input, password } = credentials;
 			const secretKey: string = process.env.JWT_SECRET;
 			let user: User;
+			let username: string;
+			let email: string;
 
-			if (email) {
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+			if (emailRegex.test(input)) {
+				email = input;
+				console.log('Email: ', email);
 				user = await UserModel.findOne({ email });
-			} else if (username) {
+			} else {
+				username = input;
+				console.log('Username: ', username);
 				user = await UserModel.findOne({ username });
 			}
 
@@ -695,26 +706,28 @@ const resolvers: Resolvers = {
 				expiresIn: '1d',
 			});
 
-			// res.cookie('token', token, {
-			// 	httpOnly: true,
-			// 	secure: true,
-			// 	expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day
-			// 	sameSite: true,
-			// });
+			res.cookie('token', token, {
+				httpOnly: true,
+				secure: true,
+				expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day
+				sameSite: true,
+			});
 
-			return { value: token };
+			return { value: token, isAuthenticated: true };
 		},
 
 		// TODO testing
 		// eslint-disable-next-line @typescript-eslint/require-await
-		logout: async (_, __, { res }: ReqResContext): Promise<boolean> => {
+		logout: async (_, __, { res }: ReqResContext): Promise<LogoutResponse> => {
 			res.clearCookie('token', {
 				httpOnly: true,
 				expires: new Date(0),
 				secure: true,
 				sameSite: true,
 			});
-			return true;
+			return {
+				loggedOut: true,
+			};
 		},
 	},
 };
