@@ -1,5 +1,4 @@
 import gql from 'graphql-tag';
-import { Database, BackendConfig } from './types';
 
 const typeDefs = gql`
 	# enums
@@ -187,13 +186,17 @@ const typeDefs = gql`
 	}
 
 	input LoginInput {
-		email: String
-		username: String
+		input: String
 		password: String!
 	}
 
 	type Token {
 		value: String!
+		isAuthenticated: Boolean
+	}
+
+	type LogoutResponse {
+		loggedOut: Boolean
 	}
 
 	type Query {
@@ -261,9 +264,9 @@ const typeDefs = gql`
 
 		updatePassword(_id: ID!, oldPassword: String!, newPassword: String!): User
 
-		login(input: LoginInput!): Token
+		login(credentials: LoginInput!): Token
 
-		logout: Boolean
+		logout: LogoutResponse
 	}
 `;
 
