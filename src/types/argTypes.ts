@@ -48,8 +48,7 @@ export interface LinkArticleToProject extends BaseArgs {
 }
 
 export interface LoginInput {
-	email?: string;
-	username?: string;
+	input: string;
 	password: string;
 }
 
