@@ -1,58 +1,63 @@
-import { startStandaloneServer } from '@apollo/server/standalone';
-import jwt, { JwtPayload } from 'jsonwebtoken';
-import { GraphQLError } from 'graphql';
-
-import { ApolloServer } from '@apollo/server';
-import typeDefs from './schema'; // Assuming typeDefs and resolvers are imported from other files
+import { ApolloServer } from 'apollo-server-express';
+import express, { Request, Response } from 'express';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import jwt from 'jsonwebtoken';
+import { User } from './types';
+import { connectToMongoDB } from './db';
+import typeDefs from './schema';
 import resolvers from './resolvers';
 import { UserModel } from './models/User.model';
-import { connectToMongoDB } from './db';
-import { User } from './types';
 
-interface AuthHeaders {
-	authorization?: string;
+interface ReqWithUser extends Request {
+	currentUser?: User;
 }
-
-interface RequestContext {
-	req: {
-		headers: AuthHeaders;
-	};
-}
-
-function getAuthToken(req: RequestContext['req']): string | undefined {
-	return req.headers.authorization;
-}
-
-const server = new ApolloServer({
-	typeDefs,
-	resolvers,
-});
 
 async function startServer() {
-	const { url } = await startStandaloneServer(server, {
-		listen: { port: 4000 },
-		context: async ({ req }: RequestContext) => {
-			const auth = getAuthToken(req);
-			if (auth && auth.startsWith('Bearer ')) {
-				const decodedToken = jwt.verify(
-					auth.substring(7),
-					process.env.JWT_SECRET
-				) as JwtPayload;
+	const app = express();
 
-				const currentUser: User = await UserModel.findById(decodedToken.userId); // Assuming User.findById returns a Promise
+	app.use(cookieParser());
 
-				return { currentUser };
+	const corsOptions = {
+		origin: 'http://localhost:5173',
+		credentials: true,
+	};
+
+	app.use(cors(corsOptions));
+
+	// eslint-disable-next-line @typescript-eslint/no-misused-promises
+	app.use(async (req: ReqWithUser, res: Response, next) => {
+		try {
+			// Check if token is present in the cookies
+			const { token } = req.cookies as { token?: string };
+
+			if (token) {
+				// Token is present, proceed with decoding and retrieving the current user
+				const decodedToken = jwt.verify(token, process.env.JWT_SECRET) as { userId: string };
+				const currentUser = await UserModel.findById(decodedToken.userId);
+				req.currentUser = currentUser;
 			}
-		},
+		} catch (error) {
+			console.error('Error verifying JWT token:', error);
+		} finally {
+			next(); // Proceed to the next middleware or route handler
+		}
 	});
 
-	void connectToMongoDB();
+	const server = new ApolloServer({
+		typeDefs,
+		resolvers,
+		context: ({ req, res }: { req: Request; res: Response }) => ({ req, res }),
+	});
 
-	console.log(`
-    📊 Connected to MongoDB
-    🚀  Server is running!
-    📭  Query at ${url}
-  `);
+	await server.start();
+	server.applyMiddleware({ app, path: '/graphql' });
+
+	await connectToMongoDB();
+
+	app.listen({ port: 4000 }, () => {
+		console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
+	});
 }
 
 startServer().catch((error) => {
