@@ -38,6 +38,11 @@ export type ArticleInput = {
   title: Scalars['String']['input'];
 };
 
+export type Authenticationstatus = {
+  __typename?: 'Authenticationstatus';
+  cookieIsPresent?: Maybe<Scalars['Boolean']['output']>;
+};
+
 export type BackendConfig = {
   __typename?: 'BackendConfig';
   cms?: Maybe<Cms>;
@@ -308,6 +313,7 @@ export type Query = {
   __typename?: 'Query';
   allArticles?: Maybe<Array<Maybe<Article>>>;
   allProjects?: Maybe<Array<Maybe<Project>>>;
+  checkAuthentication: Authenticationstatus;
   currentUser?: Maybe<User>;
   findArticle?: Maybe<Article>;
   findProject?: Maybe<Project>;
@@ -443,6 +449,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = {
   Article: ResolverTypeWrapper<Article>;
   ArticleInput: ArticleInput;
+  Authenticationstatus: ResolverTypeWrapper<Authenticationstatus>;
   BackendConfig: ResolverTypeWrapper<BackendConfig>;
   BackendConfigInput: BackendConfigInput;
   BackendEnv: BackendEnv;
@@ -474,6 +481,7 @@ export type ResolversTypes = {
 export type ResolversParentTypes = {
   Article: Article;
   ArticleInput: ArticleInput;
+  Authenticationstatus: Authenticationstatus;
   BackendConfig: BackendConfig;
   BackendConfigInput: BackendConfigInput;
   Boolean: Scalars['Boolean']['output'];
@@ -503,6 +511,11 @@ export type ArticleResolvers<ContextType = any, ParentType extends ResolversPare
   tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['Tags']>>>, ParentType, ContextType>;
   text?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type AuthenticationstatusResolvers<ContextType = any, ParentType extends ResolversParentTypes['Authenticationstatus'] = ResolversParentTypes['Authenticationstatus']> = {
+  cookieIsPresent?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -579,6 +592,7 @@ export type ProjectResolvers<ContextType = any, ParentType extends ResolversPare
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   allArticles?: Resolver<Maybe<Array<Maybe<ResolversTypes['Article']>>>, ParentType, ContextType>;
   allProjects?: Resolver<Maybe<Array<Maybe<ResolversTypes['Project']>>>, ParentType, ContextType>;
+  checkAuthentication?: Resolver<ResolversTypes['Authenticationstatus'], ParentType, ContextType>;
   currentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   findArticle?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType, Partial<QueryFindArticleArgs>>;
   findProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, Partial<QueryFindProjectArgs>>;
@@ -605,6 +619,7 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type Resolvers<ContextType = any> = {
   Article?: ArticleResolvers<ContextType>;
+  Authenticationstatus?: AuthenticationstatusResolvers<ContextType>;
   BackendConfig?: BackendConfigResolvers<ContextType>;
   FrontendConfig?: FrontendConfigResolvers<ContextType>;
   InstallScripts?: InstallScriptsResolvers<ContextType>;
