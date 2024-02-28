@@ -3,7 +3,6 @@ import express, { Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
-import { User } from './types';
 import { connectToMongoDB } from './db';
 import typeDefs from './schema';
 import resolvers from './resolvers';
