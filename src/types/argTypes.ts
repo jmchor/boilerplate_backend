@@ -71,6 +71,13 @@ export interface Token {
 }
 
 export interface ReqResContext {
-	req: Response;
-	res: Request;
+	req: ReqWithUserAndCookies;
+	res: Response;
+}
+
+export interface ReqWithUserAndCookies extends Request {
+	currentUser?: User;
+	cookies: {
+		token?: string;
+	};
 }

@@ -8,10 +8,7 @@ import { connectToMongoDB } from './db';
 import typeDefs from './schema';
 import resolvers from './resolvers';
 import { UserModel } from './models/User.model';
-
-interface ReqWithUser extends Request {
-	currentUser?: User;
-}
+import { ReqWithUserAndCookies } from './types/argTypes';
 
 async function startServer() {
 	const app = express();
@@ -26,7 +23,7 @@ async function startServer() {
 	app.use(cors(corsOptions));
 
 	// eslint-disable-next-line @typescript-eslint/no-misused-promises
-	app.use(async (req: ReqWithUser, res: Response, next) => {
+	app.use(async (req: ReqWithUserAndCookies, res: Response, next) => {
 		try {
 			// Check if token is present in the cookies
 			const { token } = req.cookies as { token?: string };
@@ -51,7 +48,7 @@ async function startServer() {
 	});
 
 	await server.start();
-	server.applyMiddleware({ app, path: '/graphql' });
+	server.applyMiddleware({ app, path: '/graphql', cors: false });
 
 	await connectToMongoDB();
 
