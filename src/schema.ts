@@ -199,6 +199,10 @@ const typeDefs = gql`
 		loggedOut: Boolean
 	}
 
+	type Authenticationstatus {
+		cookieIsPresent: Boolean
+	}
+
 	type Query {
 		allProjects: [Project]
 		findProject(_id: ID): Project
@@ -210,6 +214,8 @@ const typeDefs = gql`
 		currentUser: User
 
 		myProjects: [Project]
+
+		checkAuthentication: Authenticationstatus!
 	}
 
 	type Mutation {

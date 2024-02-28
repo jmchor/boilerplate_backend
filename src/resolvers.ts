@@ -10,7 +10,7 @@ import { ArticleModel } from './models/Article.model.js';
 import { UserModel } from './models/User.model.js';
 import { KanbanModel } from './models/Kanban.model.js';
 
-import { Article, LogoutResponse, Project, Resolvers, Token, User } from './types.js';
+import { Article, Authenticationstatus, LogoutResponse, Project, Resolvers, Token, User } from './types.js';
 import {
 	BaseArgs,
 	CreateProjectArgs,
@@ -35,6 +35,34 @@ import { inputRegex } from './utils/passwordRegex.js';
 
 const resolvers: Resolvers = {
 	Query: {
+		// eslint-disable-next-line @typescript-eslint/require-await
+		checkAuthentication: async (_, args, { req }: ReqResContext): Promise<Authenticationstatus> => {
+			const { token } = req.cookies as { token?: string };
+
+			if (!token) {
+				return {
+					cookieIsPresent: false,
+				};
+			}
+
+			try {
+				const decodedToken = jwt.verify(token, process.env.JWT_SECRET) as { userId: string };
+
+				return {
+					cookieIsPresent: true,
+				};
+			} catch (error: unknown) {
+				throw new GraphQLError('Invalid token', {
+					extensions: {
+						code: 'INVALID_TOKEN',
+					},
+				});
+
+				return {
+					cookieIsPresent: false,
+				};
+			}
+		},
 		allProjects: async (): Promise<Project[]> => {
 			const projects = await ProjectModel.find();
 
@@ -683,11 +711,9 @@ const resolvers: Resolvers = {
 
 			if (emailRegex.test(input)) {
 				email = input;
-				console.log('Email: ', email);
 				user = await UserModel.findOne({ email });
 			} else {
 				username = input;
-				console.log('Username: ', username);
 				user = await UserModel.findOne({ username });
 			}
 
