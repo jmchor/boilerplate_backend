@@ -19,6 +19,7 @@ export interface CreateProjectArgs extends EditProjectArgs {
 export interface CreateArticleArgs {
 	title: string;
 	text: string;
+	subheadline?: string;
 	tags?: string[];
 	imageUrl?: string;
 	externalLink?: string;
@@ -29,6 +30,7 @@ export interface EditArticleArgs {
 	_id: string;
 	title?: string;
 	text?: string;
+	subheadline?: string;
 	tags?: string[];
 	imageUrl?: string;
 	externalLink?: string;
@@ -52,9 +54,17 @@ export interface LoginInput {
 	password: string;
 }
 
+export interface CreateUserArgs extends BaseArgs {
+	username: string;
+	email: string;
+	password: string;
+	image?: string;
+}
+
 export interface EditUserArgs extends BaseArgs {
 	username: string;
 	email: string;
+	image?: string;
 }
 
 export interface UpdatePasswordArgs extends BaseArgs {
