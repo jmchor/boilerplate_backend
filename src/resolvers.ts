@@ -25,6 +25,7 @@ import {
 	EditUserArgs,
 	UserContext,
 	ReqResContext,
+	CreateUserArgs,
 } from './types/argTypes.js';
 
 import { generateInstallCommands } from './scripts/installCommands.js';
@@ -32,8 +33,10 @@ import { checkLoggedInUser } from './utils/checkLoggedInUser.js';
 import { checkUserIsAuthor } from './utils/checkUserIsAuthor.js';
 import { passwordValidation } from './utils/passwordValidation.js';
 import { inputRegex } from './utils/passwordRegex.js';
+import dateScalar from './types/customDateScalar.js';
 
 const resolvers: Resolvers = {
+	Date: dateScalar,
 	Query: {
 		// eslint-disable-next-line @typescript-eslint/require-await
 		checkAuthentication: async (_, args, { req }: ReqResContext): Promise<Authenticationstatus> => {
@@ -63,8 +66,8 @@ const resolvers: Resolvers = {
 				};
 			}
 		},
-		allProjects: async (): Promise<Project[]> => {
-			const projects = await ProjectModel.find();
+		allProjects: async (_, { limit }: { limit: number }): Promise<Project[]> => {
+			const projects = await ProjectModel.find().limit(limit).sort({ createdAt: -1 });
 
 			if (!projects) {
 				throw new GraphQLError('No projects found');
@@ -102,17 +105,8 @@ const resolvers: Resolvers = {
 				model: UserModel,
 			});
 		},
-		allArticles: async (_, args, { req }: ReqResContext): Promise<Article[]> => {
-			if (!req.currentUser) {
-				throw new GraphQLError('Unauthorized', {
-					extensions: {
-						code: 'UNAUTHORIZED',
-						http: { status: 401 },
-					},
-				});
-			}
-
-			const articles = await ArticleModel.find();
+		allArticles: async (): Promise<Article[]> => {
+			const articles = await ArticleModel.find().sort({ createdAt: -1 }); // Sort by createdAt in descending order
 
 			if (!articles) {
 				throw new GraphQLError('No articles found');
@@ -380,7 +374,7 @@ const resolvers: Resolvers = {
 
 		createArticle: async (
 			_,
-			{ title, text, tags, imageUrl, externalLink, createdBy }: CreateArticleArgs,
+			{ title, text, subheadline, tags, imageUrl, externalLink, createdBy }: CreateArticleArgs,
 			{ currentUser }: UserContext
 		): Promise<Article> => {
 			checkLoggedInUser(currentUser);
@@ -405,6 +399,7 @@ const resolvers: Resolvers = {
 				const newArticleData = {
 					title,
 					text,
+					subheadline,
 					tags,
 					imageUrl: defaultImage,
 					externalLink,
@@ -510,7 +505,7 @@ const resolvers: Resolvers = {
 
 		editArticle: async (
 			_,
-			{ _id, title, text, tags, imageUrl, externalLink, createdBy }: EditArticleArgs,
+			{ _id, title, text, subheadline, tags, imageUrl, externalLink, createdBy }: EditArticleArgs,
 			{ currentUser }: UserContext
 		): Promise<Article> => {
 			checkLoggedInUser(currentUser);
@@ -522,6 +517,7 @@ const resolvers: Resolvers = {
 					{
 						title,
 						text,
+						subheadline,
 						tags,
 						imageUrl,
 						externalLink,
@@ -564,7 +560,7 @@ const resolvers: Resolvers = {
 			}
 		},
 
-		createUser: async (_, { username, email, password }: LoginInput): Promise<User> => {
+		createUser: async (_, { username, email, password, image }: CreateUserArgs): Promise<User> => {
 			try {
 				inputRegex(email, 'email');
 
@@ -580,11 +576,25 @@ const resolvers: Resolvers = {
 					);
 				}
 
+				let defaultImage: string = '';
+
+				if (image === '') {
+					defaultImage =
+						'https://res.cloudinary.com/dompqbumr/image/upload/v1709477275/codeBase/default_boiler.svg';
+				} else {
+					defaultImage = image;
+				}
+
 				// need to has the password
 				const salt = genSaltSync(10);
 				const hashedPassword = hashSync(password, salt);
 
-				const user = new UserModel({ username, email, passwordHash: hashedPassword });
+				const user = new UserModel({
+					username,
+					email,
+					image: defaultImage,
+					passwordHash: hashedPassword,
+				});
 
 				console.log('Saving user to the database...', user);
 				await user.save();
