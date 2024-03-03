@@ -3,6 +3,8 @@ import gql from 'graphql-tag';
 const typeDefs = gql`
 	# enums
 
+	scalar Date
+
 	enum ModuleType {
 		commonjs
 		module
@@ -86,6 +88,7 @@ const typeDefs = gql`
 	type User {
 		username: String!
 		email: String!
+		image: String
 		passwordHash: String!
 		projects: [Project]
 		articles: [Article]
@@ -95,13 +98,15 @@ const typeDefs = gql`
 
 	type Article {
 		title: String!
-		text: String!
+		text: String
+		subheadline: String
 		tags: [Tags]
 		imageUrl: String
 		externalLink: String
 		linkedProjects: [Project]
-		createdBy: User!
+		createdBy: User
 		_id: ID
+		createdAt: Date
 	}
 
 	type Kanban {
@@ -115,11 +120,11 @@ const typeDefs = gql`
 	}
 
 	type Project {
-		title: String!
+		title: String
 		description: String
-		createdBy: User!
-		frontend: FrontendConfig!
-		backend: BackendConfig!
+		createdBy: User
+		frontend: FrontendConfig
+		backend: BackendConfig
 		installScripts: InstallScripts
 		kanban: Kanban
 		articles: [Article]
@@ -129,15 +134,15 @@ const typeDefs = gql`
 	type FrontendConfig {
 		framework: FrontFrame
 		gqlClient: Boolean
-		packages: [Packages!]!
+		packages: [Packages]
 	}
 
 	type BackendConfig {
-		environment: BackendEnv!
+		environment: BackendEnv
 		moduleType: ModuleType
 		gqlServer: Boolean
 		cms: CMS
-		packages: [Packages!]!
+		packages: [Packages]
 		database: Database
 	}
 
@@ -149,15 +154,15 @@ const typeDefs = gql`
 	input FrontendConfigInput {
 		framework: FrontFrame
 		gqlClient: Boolean
-		packages: [Packages!]!
+		packages: [Packages]
 	}
 
 	input BackendConfigInput {
-		environment: BackendEnv!
+		environment: BackendEnv
 		moduleType: ModuleType
 		gqlServer: Boolean
 		cms: CMS
-		packages: [Packages!]!
+		packages: [Packages]
 		database: Database
 	}
 
@@ -166,8 +171,9 @@ const typeDefs = gql`
 		backend: String
 	}
 	input ArticleInput {
-		title: String!
-		text: String!
+		title: String
+		text: String
+		subheadline: String
 		tags: [Tags]
 		imageUrl: String
 		externalLink: String
@@ -181,8 +187,8 @@ const typeDefs = gql`
 		todo: [String]
 		doing: [String]
 		done: [String]
-		project: ID!
-		createdBy: ID!
+		project: ID
+		createdBy: ID
 	}
 
 	input LoginInput {
@@ -204,11 +210,11 @@ const typeDefs = gql`
 	}
 
 	type Query {
-		allProjects: [Project]
+		allProjects(limit: Int): [Project]
 		findProject(_id: ID): Project
 		searchProject(_id: ID, title: String): Project
 
-		allArticles: [Article]
+		allArticles(limit: Int): [Article]
 		findArticle(_id: ID): Article
 
 		currentUser: User
@@ -245,6 +251,7 @@ const typeDefs = gql`
 		createArticle(
 			title: String!
 			text: String!
+			subheadline: String
 			tags: [Tags]
 			imageUrl: String
 			externalLink: String
@@ -258,15 +265,16 @@ const typeDefs = gql`
 			_id: ID!
 			title: String
 			text: String
+			subheadline: String
 			tags: [Tags]
 			imageUrl: String
 			externalLink: String
 			createdBy: ID!
 		): Article
 
-		createUser(username: String!, email: String!, password: String!): User
+		createUser(username: String!, email: String!, password: String!, image: String): User
 
-		editUser(_id: ID!, username: String, email: String): User
+		editUser(_id: ID!, username: String, email: String, image: String): User
 
 		updatePassword(_id: ID!, oldPassword: String!, newPassword: String!): User
 

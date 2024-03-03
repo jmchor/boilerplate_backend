@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo } from 'graphql';
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -14,17 +14,20 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  Date: { input: any; output: any; }
 };
 
 export type Article = {
   __typename?: 'Article';
   _id?: Maybe<Scalars['ID']['output']>;
-  createdBy: User;
+  createdAt?: Maybe<Scalars['Date']['output']>;
+  createdBy?: Maybe<User>;
   externalLink?: Maybe<Scalars['String']['output']>;
   imageUrl?: Maybe<Scalars['String']['output']>;
   linkedProjects?: Maybe<Array<Maybe<Project>>>;
+  subheadline?: Maybe<Scalars['String']['output']>;
   tags?: Maybe<Array<Maybe<Tags>>>;
-  text: Scalars['String']['output'];
+  text?: Maybe<Scalars['String']['output']>;
   title: Scalars['String']['output'];
 };
 
@@ -33,9 +36,10 @@ export type ArticleInput = {
   externalLink?: InputMaybe<Scalars['String']['input']>;
   imageUrl?: InputMaybe<Scalars['String']['input']>;
   linkedProjects?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  subheadline?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Tags>>>;
-  text: Scalars['String']['input'];
-  title: Scalars['String']['input'];
+  text?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Authenticationstatus = {
@@ -47,19 +51,19 @@ export type BackendConfig = {
   __typename?: 'BackendConfig';
   cms?: Maybe<Cms>;
   database?: Maybe<Database>;
-  environment: BackendEnv;
+  environment?: Maybe<BackendEnv>;
   gqlServer?: Maybe<Scalars['Boolean']['output']>;
   moduleType?: Maybe<ModuleType>;
-  packages: Array<Packages>;
+  packages?: Maybe<Array<Maybe<Packages>>>;
 };
 
 export type BackendConfigInput = {
   cms?: InputMaybe<Cms>;
   database?: InputMaybe<Database>;
-  environment: BackendEnv;
+  environment?: InputMaybe<BackendEnv>;
   gqlServer?: InputMaybe<Scalars['Boolean']['input']>;
   moduleType?: InputMaybe<ModuleType>;
-  packages: Array<Packages>;
+  packages?: InputMaybe<Array<InputMaybe<Packages>>>;
 };
 
 export enum BackendEnv {
@@ -90,13 +94,13 @@ export type FrontendConfig = {
   __typename?: 'FrontendConfig';
   framework?: Maybe<FrontFrame>;
   gqlClient?: Maybe<Scalars['Boolean']['output']>;
-  packages: Array<Packages>;
+  packages?: Maybe<Array<Maybe<Packages>>>;
 };
 
 export type FrontendConfigInput = {
   framework?: InputMaybe<FrontFrame>;
   gqlClient?: InputMaybe<Scalars['Boolean']['input']>;
-  packages: Array<Packages>;
+  packages?: InputMaybe<Array<InputMaybe<Packages>>>;
 };
 
 export type InstallScripts = {
@@ -123,10 +127,10 @@ export type Kanban = {
 
 export type KanbanInput = {
   backlog?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  createdBy: Scalars['ID']['input'];
+  createdBy?: InputMaybe<Scalars['ID']['input']>;
   doing?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   done?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  project: Scalars['ID']['input'];
+  project?: InputMaybe<Scalars['ID']['input']>;
   todo?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
@@ -175,6 +179,7 @@ export type MutationCreateArticleArgs = {
   externalLink?: InputMaybe<Scalars['String']['input']>;
   imageUrl?: InputMaybe<Scalars['String']['input']>;
   linkedProjects?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  subheadline?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Tags>>>;
   text: Scalars['String']['input'];
   title: Scalars['String']['input'];
@@ -195,6 +200,7 @@ export type MutationCreateProjectArgs = {
 
 export type MutationCreateUserArgs = {
   email: Scalars['String']['input'];
+  image?: InputMaybe<Scalars['String']['input']>;
   password: Scalars['String']['input'];
   username: Scalars['String']['input'];
 };
@@ -229,6 +235,7 @@ export type MutationEditArticleArgs = {
   createdBy: Scalars['ID']['input'];
   externalLink?: InputMaybe<Scalars['String']['input']>;
   imageUrl?: InputMaybe<Scalars['String']['input']>;
+  subheadline?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Tags>>>;
   text?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
@@ -246,6 +253,7 @@ export type MutationEditProjectArgs = {
 export type MutationEditUserArgs = {
   _id: Scalars['ID']['input'];
   email?: InputMaybe<Scalars['String']['input']>;
+  image?: InputMaybe<Scalars['String']['input']>;
   username?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -300,13 +308,13 @@ export type Project = {
   __typename?: 'Project';
   _id?: Maybe<Scalars['ID']['output']>;
   articles?: Maybe<Array<Maybe<Article>>>;
-  backend: BackendConfig;
-  createdBy: User;
+  backend?: Maybe<BackendConfig>;
+  createdBy?: Maybe<User>;
   description?: Maybe<Scalars['String']['output']>;
-  frontend: FrontendConfig;
+  frontend?: Maybe<FrontendConfig>;
   installScripts?: Maybe<InstallScripts>;
   kanban?: Maybe<Kanban>;
-  title: Scalars['String']['output'];
+  title?: Maybe<Scalars['String']['output']>;
 };
 
 export type Query = {
@@ -319,6 +327,16 @@ export type Query = {
   findProject?: Maybe<Project>;
   myProjects?: Maybe<Array<Maybe<Project>>>;
   searchProject?: Maybe<Project>;
+};
+
+
+export type QueryAllArticlesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryAllProjectsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -370,6 +388,7 @@ export type User = {
   _id?: Maybe<Scalars['ID']['output']>;
   articles?: Maybe<Array<Maybe<Article>>>;
   email: Scalars['String']['output'];
+  image?: Maybe<Scalars['String']['output']>;
   likedArticles?: Maybe<Array<Maybe<Article>>>;
   passwordHash: Scalars['String']['output'];
   projects?: Maybe<Array<Maybe<Project>>>;
@@ -456,12 +475,14 @@ export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   CMS: Cms;
   Database: Database;
+  Date: ResolverTypeWrapper<Scalars['Date']['output']>;
   FrontFrame: FrontFrame;
   FrontendConfig: ResolverTypeWrapper<FrontendConfig>;
   FrontendConfigInput: FrontendConfigInput;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   InstallScripts: ResolverTypeWrapper<InstallScripts>;
   InstallScriptsInput: InstallScriptsInput;
+  Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Kanban: ResolverTypeWrapper<Kanban>;
   KanbanInput: KanbanInput;
   LoginInput: LoginInput;
@@ -485,11 +506,13 @@ export type ResolversParentTypes = {
   BackendConfig: BackendConfig;
   BackendConfigInput: BackendConfigInput;
   Boolean: Scalars['Boolean']['output'];
+  Date: Scalars['Date']['output'];
   FrontendConfig: FrontendConfig;
   FrontendConfigInput: FrontendConfigInput;
   ID: Scalars['ID']['output'];
   InstallScripts: InstallScripts;
   InstallScriptsInput: InstallScriptsInput;
+  Int: Scalars['Int']['output'];
   Kanban: Kanban;
   KanbanInput: KanbanInput;
   LoginInput: LoginInput;
@@ -504,12 +527,14 @@ export type ResolversParentTypes = {
 
 export type ArticleResolvers<ContextType = any, ParentType extends ResolversParentTypes['Article'] = ResolversParentTypes['Article']> = {
   _id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
-  createdBy?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  createdAt?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
+  createdBy?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   externalLink?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   imageUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   linkedProjects?: Resolver<Maybe<Array<Maybe<ResolversTypes['Project']>>>, ParentType, ContextType>;
+  subheadline?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['Tags']>>>, ParentType, ContextType>;
-  text?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  text?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -522,17 +547,21 @@ export type AuthenticationstatusResolvers<ContextType = any, ParentType extends 
 export type BackendConfigResolvers<ContextType = any, ParentType extends ResolversParentTypes['BackendConfig'] = ResolversParentTypes['BackendConfig']> = {
   cms?: Resolver<Maybe<ResolversTypes['CMS']>, ParentType, ContextType>;
   database?: Resolver<Maybe<ResolversTypes['Database']>, ParentType, ContextType>;
-  environment?: Resolver<ResolversTypes['BackendEnv'], ParentType, ContextType>;
+  environment?: Resolver<Maybe<ResolversTypes['BackendEnv']>, ParentType, ContextType>;
   gqlServer?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   moduleType?: Resolver<Maybe<ResolversTypes['ModuleType']>, ParentType, ContextType>;
-  packages?: Resolver<Array<ResolversTypes['Packages']>, ParentType, ContextType>;
+  packages?: Resolver<Maybe<Array<Maybe<ResolversTypes['Packages']>>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
+
+export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
+  name: 'Date';
+}
 
 export type FrontendConfigResolvers<ContextType = any, ParentType extends ResolversParentTypes['FrontendConfig'] = ResolversParentTypes['FrontendConfig']> = {
   framework?: Resolver<Maybe<ResolversTypes['FrontFrame']>, ParentType, ContextType>;
   gqlClient?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
-  packages?: Resolver<Array<ResolversTypes['Packages']>, ParentType, ContextType>;
+  packages?: Resolver<Maybe<Array<Maybe<ResolversTypes['Packages']>>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -579,19 +608,19 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 export type ProjectResolvers<ContextType = any, ParentType extends ResolversParentTypes['Project'] = ResolversParentTypes['Project']> = {
   _id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   articles?: Resolver<Maybe<Array<Maybe<ResolversTypes['Article']>>>, ParentType, ContextType>;
-  backend?: Resolver<ResolversTypes['BackendConfig'], ParentType, ContextType>;
-  createdBy?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  backend?: Resolver<Maybe<ResolversTypes['BackendConfig']>, ParentType, ContextType>;
+  createdBy?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  frontend?: Resolver<ResolversTypes['FrontendConfig'], ParentType, ContextType>;
+  frontend?: Resolver<Maybe<ResolversTypes['FrontendConfig']>, ParentType, ContextType>;
   installScripts?: Resolver<Maybe<ResolversTypes['InstallScripts']>, ParentType, ContextType>;
   kanban?: Resolver<Maybe<ResolversTypes['Kanban']>, ParentType, ContextType>;
-  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  allArticles?: Resolver<Maybe<Array<Maybe<ResolversTypes['Article']>>>, ParentType, ContextType>;
-  allProjects?: Resolver<Maybe<Array<Maybe<ResolversTypes['Project']>>>, ParentType, ContextType>;
+  allArticles?: Resolver<Maybe<Array<Maybe<ResolversTypes['Article']>>>, ParentType, ContextType, Partial<QueryAllArticlesArgs>>;
+  allProjects?: Resolver<Maybe<Array<Maybe<ResolversTypes['Project']>>>, ParentType, ContextType, Partial<QueryAllProjectsArgs>>;
   checkAuthentication?: Resolver<ResolversTypes['Authenticationstatus'], ParentType, ContextType>;
   currentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   findArticle?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType, Partial<QueryFindArticleArgs>>;
@@ -610,6 +639,7 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
   _id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   articles?: Resolver<Maybe<Array<Maybe<ResolversTypes['Article']>>>, ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  image?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   likedArticles?: Resolver<Maybe<Array<Maybe<ResolversTypes['Article']>>>, ParentType, ContextType>;
   passwordHash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   projects?: Resolver<Maybe<Array<Maybe<ResolversTypes['Project']>>>, ParentType, ContextType>;
@@ -621,6 +651,7 @@ export type Resolvers<ContextType = any> = {
   Article?: ArticleResolvers<ContextType>;
   Authenticationstatus?: AuthenticationstatusResolvers<ContextType>;
   BackendConfig?: BackendConfigResolvers<ContextType>;
+  Date?: GraphQLScalarType;
   FrontendConfig?: FrontendConfigResolvers<ContextType>;
   InstallScripts?: InstallScriptsResolvers<ContextType>;
   Kanban?: KanbanResolvers<ContextType>;
