@@ -24,6 +24,10 @@ const userSchema = new Schema<User>(
 			required: [true, 'Password is required.'],
 			minlength: 6,
 		},
+		image: {
+			type: String,
+			default: '',
+		},
 
 		projects: [
 			{
