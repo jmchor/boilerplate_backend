@@ -14,6 +14,10 @@ const articleSchema = new Schema<Article>(
 			type: String,
 			required: true,
 		},
+		subheadline: {
+			type: String,
+			default: '',
+		},
 		text: {
 			type: String,
 			required: true,
