@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { GraphQLError } from 'graphql';
 import { genSaltSync, hashSync } from 'bcrypt-ts';
 import mongoose, { ClientSession } from 'mongoose';
 import jwt from 'jsonwebtoken';
-import cookie from 'cookie';
-import express from 'express';
 
 import { ProjectModel } from './models/Project.model.js';
 import { ArticleModel } from './models/Article.model.js';
@@ -34,6 +34,7 @@ import { checkUserIsAuthor } from './utils/checkUserIsAuthor.js';
 import { passwordValidation } from './utils/passwordValidation.js';
 import { inputRegex } from './utils/passwordRegex.js';
 import dateScalar from './types/customDateScalar.js';
+import { sanitizeText } from './utils/sanitizeText.js';
 
 const resolvers: Resolvers = {
 	Date: dateScalar,
@@ -98,7 +99,6 @@ const resolvers: Resolvers = {
 					},
 				});
 			}
-			console.log(project);
 
 			return project.populate({
 				path: 'createdBy',
@@ -149,10 +149,12 @@ const resolvers: Resolvers = {
 				.populate({
 					path: 'projects',
 					model: ProjectModel,
+					options: { sort: { createdAt: -1 } },
 				})
 				.populate({
 					path: 'articles',
 					model: ArticleModel,
+					options: { sort: { createdAt: -1 } },
 				})
 				.populate({
 					path: 'likedArticles',
@@ -198,8 +200,10 @@ const resolvers: Resolvers = {
 		createProject: async (
 			parent,
 			{ title, description, createdBy, frontend, backend }: CreateProjectArgs,
-			{ currentUser }: UserContext
+			{ req }: ReqResContext
 		): Promise<Project> => {
+			const { currentUser } = req;
+
 			checkLoggedInUser(currentUser);
 
 			try {
@@ -221,9 +225,7 @@ const resolvers: Resolvers = {
 					},
 				};
 
-				const newProject = new ProjectModel(newProjectData);
-
-				await newProject.save();
+				const newProject = await new ProjectModel(newProjectData).save();
 
 				const projectToUpdate = await generateInstallCommands(newProject._id);
 				const {
@@ -266,6 +268,18 @@ const resolvers: Resolvers = {
 					{ new: true }
 				);
 
+				// update the user with the new project
+
+				await UserModel.findByIdAndUpdate(
+					createdBy,
+					{
+						$push: {
+							projects: updatedProject._id,
+						},
+					},
+					{ new: true }
+				);
+
 				const populatedProject = await ProjectModel.findById(updatedProject._id)
 					.populate({
 						path: 'createdBy',
@@ -295,9 +309,10 @@ const resolvers: Resolvers = {
 		editProject: async (
 			_,
 			{ _id, title, description, createdBy }: EditProjectArgs,
-			{ currentUser }: UserContext
+			{ req }: ReqResContext
 		): Promise<Project> => {
 			try {
+				const { currentUser } = req;
 				checkLoggedInUser(currentUser);
 
 				checkUserIsAuthor(currentUser, createdBy);
@@ -334,8 +349,9 @@ const resolvers: Resolvers = {
 		deleteProject: async (
 			_,
 			{ _id, createdBy }: DeleteDocument,
-			{ currentUser }: UserContext
+			{ req }: ReqResContext
 		): Promise<boolean> => {
+			const { currentUser } = req;
 			checkLoggedInUser(currentUser);
 			checkUserIsAuthor(currentUser, createdBy);
 
@@ -354,7 +370,8 @@ const resolvers: Resolvers = {
 			}
 		},
 
-		deleteKanban: async (_, { _id, createdBy }: DeleteDocument, { currentUser }: UserContext) => {
+		deleteKanban: async (_, { _id, createdBy }: DeleteDocument, { req }: ReqResContext) => {
+			const { currentUser } = req;
 			checkLoggedInUser(currentUser);
 			checkUserIsAuthor(currentUser, createdBy);
 
@@ -377,7 +394,7 @@ const resolvers: Resolvers = {
 			{ title, text, subheadline, tags, imageUrl, externalLink, createdBy }: CreateArticleArgs,
 			{ currentUser }: UserContext
 		): Promise<Article> => {
-			checkLoggedInUser(currentUser);
+			// checkLoggedInUser(currentUser);
 
 			try {
 				console.log('Checking if article already exists...');
@@ -389,7 +406,9 @@ const resolvers: Resolvers = {
 
 				let defaultImage: string;
 
-				if (imageUrl === '') {
+				const cleanText = sanitizeText(text);
+
+				if (imageUrl === '' || !imageUrl) {
 					defaultImage =
 						'https://res.cloudinary.com/dompqbumr/image/upload/v1708283369/codeBase/default_article_banner_0012.jpg';
 				} else {
@@ -398,7 +417,7 @@ const resolvers: Resolvers = {
 
 				const newArticleData = {
 					title,
-					text,
+					text: cleanText,
 					subheadline,
 					tags,
 					imageUrl: defaultImage,
@@ -511,12 +530,14 @@ const resolvers: Resolvers = {
 			checkLoggedInUser(currentUser);
 			checkUserIsAuthor(currentUser, createdBy);
 
+			const cleanText = sanitizeText(text);
+
 			try {
 				const article = await ArticleModel.findByIdAndUpdate(
 					_id,
 					{
 						title,
-						text,
+						text: cleanText,
 						subheadline,
 						tags,
 						imageUrl,
@@ -576,7 +597,7 @@ const resolvers: Resolvers = {
 					);
 				}
 
-				let defaultImage: string = '';
+				let defaultImage: string;
 
 				if (image === '') {
 					defaultImage =
@@ -596,7 +617,6 @@ const resolvers: Resolvers = {
 					passwordHash: hashedPassword,
 				});
 
-				console.log('Saving user to the database...', user);
 				await user.save();
 				return user;
 			} catch (error: unknown) {
@@ -752,7 +772,6 @@ const resolvers: Resolvers = {
 			return { value: token, isAuthenticated: true };
 		},
 
-		// TODO testing
 		// eslint-disable-next-line @typescript-eslint/require-await
 		logout: async (_, __, { res }: ReqResContext): Promise<LogoutResponse> => {
 			res.clearCookie('token', {
