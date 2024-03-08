@@ -24,8 +24,6 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 		const { framework, gqlClient, packages: frontPackages } = frontend;
 		const { environment, moduleType, gqlServer, packages: backPackages, database, cms } = backend;
 
-		console.log(frontend);
-
 		const {
 			GraphqlCodegenCli,
 			GraphqlCodegenTypescript,
@@ -86,9 +84,28 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 		}
 
 		// Frontend data layer specific commands
-		if (gqlClient) {
+		if (gqlClient || gqlServer) {
 			frontendPackages.push(ApolloClient, Graphql, GraphqlTag);
+			backendPackages.push(
+				ApolloServer,
+				Graphql,
+				GraphqlTag,
+				GraphqlCodegenCli,
+				GraphqlCodegenTypescript,
+				GraphqlCodegenTypescriptResolvers
+			);
 		}
+
+		// if (gqlServer) {
+		// 	backendPackages.push(
+		// 		ApolloServer,
+		// 		Graphql,
+		// 		GraphqlTag,
+		// 		GraphqlCodegenCli,
+		// 		GraphqlCodegenTypescript,
+		// 		GraphqlCodegenTypescriptResolvers
+		// 	);
+		// }
 
 		// Backend setup commands
 		backendCommands.push(`mkdir ${kebabCaseTitle}-backend`);
@@ -125,16 +142,6 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 		}
 
 		// Backend data layer specific commands
-		if (gqlServer) {
-			backendPackages.push(
-				ApolloServer,
-				Graphql,
-				GraphqlTag,
-				GraphqlCodegenCli,
-				GraphqlCodegenTypescript,
-				GraphqlCodegenTypescriptResolvers
-			);
-		}
 
 		if (cms === KeystoneJs) {
 			backendCommands.push(`cd ${kebabCaseTitle}-backend`);
