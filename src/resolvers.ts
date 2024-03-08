@@ -599,7 +599,7 @@ const resolvers: Resolvers = {
 
 				let defaultImage: string;
 
-				if (image === '') {
+				if (image === '' || !image) {
 					defaultImage =
 						'https://res.cloudinary.com/dompqbumr/image/upload/v1709477275/codeBase/default_boiler.svg';
 				} else {
