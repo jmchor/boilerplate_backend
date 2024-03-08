@@ -3,11 +3,12 @@ import express, { Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
-import { connectToMongoDB } from './db';
-import typeDefs from './schema';
-import resolvers from './resolvers';
-import { UserModel } from './models/User.model';
-import { ReqWithUserAndCookies } from './types/argTypes';
+
+import { connectToMongoDB } from './db.js';
+import typeDefs from './schema.js';
+import resolvers from './resolvers.js';
+import { UserModel } from './models/User.model.js';
+import { ReqWithUserAndCookies } from './types/argTypes.js';
 
 async function startServer() {
 	const app = express();
