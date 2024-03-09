@@ -1,4 +1,4 @@
-# CodeBase
+# Boilerplate
 
 ### an app to simplify the setup and organization of new coding projects
 
