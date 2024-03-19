@@ -63,28 +63,6 @@ const typeDefs = gql`
 		typesExpress
 	}
 
-	enum Tags {
-		database
-		backend
-		frontend
-		wordpress
-		keystone
-		technical_writing
-		blog
-		graphql
-		validation
-		tests
-		no_sql
-		sql
-		misc
-		react
-		typescript
-		programming
-		software_engineering
-		wiki
-		deployment
-	}
-
 	type User {
 		username: String!
 		email: String!
@@ -100,7 +78,7 @@ const typeDefs = gql`
 		title: String!
 		text: String
 		subheadline: String
-		tags: [Tags]
+		tags: [String]
 		imageUrl: String
 		externalLink: String
 		linkedProjects: [Project]
@@ -108,12 +86,15 @@ const typeDefs = gql`
 		_id: ID
 		createdAt: Date
 	}
+	type KanbanCard {
+		title: String
+	}
 
 	type Kanban {
-		backlog: [String]
-		todo: [String]
-		doing: [String]
-		done: [String]
+		backlog: [KanbanCard]
+		todo: [KanbanCard]
+		doing: [KanbanCard]
+		done: [KanbanCard]
 		project: Project!
 		createdBy: User!
 		_id: ID!
@@ -128,6 +109,7 @@ const typeDefs = gql`
 		installScripts: InstallScripts
 		kanban: Kanban
 		articles: [Article]
+		tags: [String]
 		_id: ID
 	}
 
@@ -174,7 +156,7 @@ const typeDefs = gql`
 		title: String
 		text: String
 		subheadline: String
-		tags: [Tags]
+		tags: [String]
 		imageUrl: String
 		externalLink: String
 		linkedProjects: [ID]
@@ -182,11 +164,15 @@ const typeDefs = gql`
 		# Any other fields from Article that are required for creating a new article
 	}
 
+	input KanbanCardInput {
+		title: String
+	}
+
 	input KanbanInput {
-		backlog: [String]
-		todo: [String]
-		doing: [String]
-		done: [String]
+		backlog: [KanbanCardInput]
+		todo: [KanbanCardInput]
+		doing: [KanbanCardInput]
+		done: [KanbanCardInput]
 		project: ID
 		createdBy: ID
 	}
@@ -209,19 +195,38 @@ const typeDefs = gql`
 		cookieIsPresent: Boolean
 	}
 
+	type Title {
+		title: String
+		type: String
+	}
+
+	type TagWithType {
+		tag: String
+		type: String
+	}
+
 	type Query {
 		allProjects(limit: Int): [Project]
 		findProject(_id: ID): Project
-		searchProject(_id: ID, title: String): Project
+		searchProject(title: String): ID
+		searchProjectsByTag(_id: ID, tag: String): [Project]
 
 		allArticles(limit: Int): [Article]
 		findArticle(_id: ID): Article
+		searchArticleByTitle(title: String): ID
+		searchArticlesByTag(_id: ID, tag: String): [Article]
+
+		allTags: [TagWithType]
+
+		allTitles: [Title]
 
 		currentUser: User
 
 		myProjects: [Project]
 
 		checkAuthentication: Authenticationstatus!
+
+		findKanban(_id: ID): Kanban
 	}
 
 	type Mutation {
@@ -235,16 +240,34 @@ const typeDefs = gql`
 			installScripts: InstallScriptsInput
 			kanban: KanbanInput
 			articles: [ArticleInput]
+			tags: [String]
 		): Project
 		addInstallScript(_id: ID!): Project
 
-		editProject(_id: ID!, title: String, description: String, createdBy: ID!): Project
+		editProject(_id: ID!, title: String, description: String, createdBy: ID!, tags: [String]): Project
 
 		deleteProject(_id: ID!, createdBy: ID!): Boolean
 
 		deleteArticle(_id: ID!, createdBy: ID!): Boolean
 
+		createKanban(
+			backlog: [KanbanCardInput]
+			todo: [KanbanCardInput]
+			doing: [KanbanCardInput]
+			done: [KanbanCardInput]
+			project: ID!
+			createdBy: ID!
+		): Kanban
+
 		deleteKanban(_id: ID!, createdBy: ID!): Boolean
+
+		editKanban(
+			_id: ID!
+			backlog: [KanbanCardInput]
+			todo: [KanbanCardInput]
+			doing: [KanbanCardInput]
+			done: [KanbanCardInput]
+		): Kanban
 
 		deleteUser(_id: ID!, password: String!): Boolean
 
@@ -252,7 +275,7 @@ const typeDefs = gql`
 			title: String!
 			text: String!
 			subheadline: String
-			tags: [Tags]
+			tags: [String]
 			imageUrl: String
 			externalLink: String
 			linkedProjects: [ID]
@@ -266,7 +289,7 @@ const typeDefs = gql`
 			title: String
 			text: String
 			subheadline: String
-			tags: [Tags]
+			tags: [String]
 			imageUrl: String
 			externalLink: String
 			createdBy: ID!
