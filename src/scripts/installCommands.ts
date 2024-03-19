@@ -71,15 +71,17 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 
 		// Frontend framework specific commands
 		if (framework === Reactts) {
-			frontendCommands.push(`npm create vite@latest ${kebabCaseTitle} -- --template react-ts`);
-			frontendCommands.push(`cd ${kebabCaseTitle}`);
+			frontendCommands.push(
+				`<li>npm create vite@latest ${kebabCaseTitle} -- --template react-ts</li>`
+			);
+			frontendCommands.push(`<li>cd ${kebabCaseTitle}</li>`);
 			frontendPackages.push(Tsx, Tsup, Nodemon);
 		} else if (framework === Nextjs) {
-			frontendCommands.push(`npx create-next-app ${kebabCaseTitle}`);
-			frontendCommands.push(`cd ${kebabCaseTitle}`);
+			frontendCommands.push(`<li>npx create-next-app ${kebabCaseTitle}</li>`);
+			frontendCommands.push(`<li>cd ${kebabCaseTitle}</li>`);
 		} else if (framework === Reactjs) {
-			frontendCommands.push(`npm create vite@latest ${kebabCaseTitle} -- --template react`);
-			frontendCommands.push(`cd ${kebabCaseTitle}`);
+			frontendCommands.push(`<li>npm create vite@latest ${kebabCaseTitle} -- --template react</li>`);
+			frontendCommands.push(`<li>cd ${kebabCaseTitle}</li>`);
 			frontendPackages.push(Nodemon);
 		}
 
@@ -108,9 +110,9 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 		// }
 
 		// Backend setup commands
-		backendCommands.push(`mkdir ${kebabCaseTitle}-backend`);
-		backendCommands.push(`cd ${kebabCaseTitle}-backend`);
-		backendCommands.push('npm init -y');
+		backendCommands.push(`<li>mkdir ${kebabCaseTitle}-backend</li>`);
+		backendCommands.push(`<li>cd ${kebabCaseTitle}-backend</li>`);
+		backendCommands.push('<li>npm init -y</li>');
 
 		if (environment === Nodets || environment === NodeExpressTs) {
 			backendPackages.push(Typescript, TypesNode, Tsx, Tsup);
@@ -144,18 +146,18 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 		// Backend data layer specific commands
 
 		if (cms === KeystoneJs) {
-			backendCommands.push(`cd ${kebabCaseTitle}-backend`);
-			backendCommands.push('npm init keystone-app@latest');
+			backendCommands.push(`<li>cd ${kebabCaseTitle}-backend</li>`);
+			backendCommands.push('<li>npm init keystone-app@latest</li>');
 		} else if (cms === Strapi) {
-			backendCommands.push(`cd ${kebabCaseTitle}-backend`);
-			backendCommands.push(`npx create-strapi-app@latest ${kebabCaseTitle}`);
+			backendCommands.push(`<li>cd ${kebabCaseTitle}-backend</li>`);
+			backendCommands.push(`<li>npx create-strapi-app@latest ${kebabCaseTitle}</li>`);
 		}
 
 		// Backend module type specific commands
 		if (moduleType === Module) {
-			backendCommands.push('npm pkg set type="module"');
+			backendCommands.push('<li>npm pkg set type="module"</li>');
 		} else if (moduleType === Commonjs) {
-			backendCommands.push('npm pkg set type="commonjs"');
+			backendCommands.push('<li>npm pkg set type="commonjs"</li>');
 		}
 
 		// Database specific commands
@@ -173,9 +175,9 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 		const backendPackageNames = backendPackages.map((pkg) => packageMappings[pkg]);
 
 		// Construct npm install commands
-		const frontendInstalls = `npm install ${frontendPackageNames.join(' ')}`;
+		const frontendInstalls = `<li>npm install ${frontendPackageNames.join(' ')}</li><li>cd ..</li>`;
 
-		const backendInstalls = `npm install ${backendPackageNames.join(' ')}`;
+		const backendInstalls = `<li>npm install ${backendPackageNames.join(' ')}</li><li>cd ..</li>`;
 
 		// Combine all commands
 		const frontendInstallCommands = frontendCommands.concat(frontendInstalls).join('\n');
