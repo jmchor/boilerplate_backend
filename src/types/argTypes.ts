@@ -9,6 +9,7 @@ export interface EditProjectArgs extends BaseArgs {
 	title: string;
 	description: string;
 	createdBy: string;
+	tags: string[];
 }
 
 export interface CreateProjectArgs extends EditProjectArgs {
@@ -34,6 +35,22 @@ export interface EditArticleArgs {
 	tags?: string[];
 	imageUrl?: string;
 	externalLink?: string;
+	createdBy: string;
+}
+export interface CreateKanbanArgs {
+	backlog: KanbanArgs[] | null;
+	todo: KanbanArgs[] | null;
+	doing: KanbanArgs[] | null;
+	done: KanbanArgs[] | null;
+	createdBy: string;
+	project: string;
+}
+
+export interface EditKanbanArgs extends BaseArgs {
+	backlog: KanbanArgs[] | null;
+	todo: KanbanArgs[] | null;
+	doing: KanbanArgs[] | null;
+	done: KanbanArgs[] | null;
 	createdBy: string;
 }
 
@@ -90,4 +107,8 @@ export interface ReqWithUserAndCookies extends Request {
 	cookies: {
 		token?: string;
 	};
+}
+
+export interface KanbanArgs {
+	title: string;
 }
