@@ -26,32 +26,10 @@ const articleSchema = new Schema<Article>(
 			type: String,
 		},
 
-		tags: [
-			{
-				type: String,
-				enum: [
-					'database',
-					'backend',
-					'frontend',
-					'wordpress',
-					'keystone',
-					'technical_writing',
-					'blog',
-					'graphql',
-					'validation',
-					'tests',
-					'no_sql',
-					'sql',
-					'misc',
-					'react',
-					'typescript',
-					'programming',
-					'software_engineering',
-					'wiki',
-					'deployment',
-				],
-			},
-		],
+		tags: {
+			type: [String],
+			default: [],
+		},
 		createdBy: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'UserModel',

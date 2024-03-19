@@ -5,19 +5,38 @@ import { Kanban } from '../types.js';
 
 const kanbanSchema = new Schema<Kanban>({
 	backlog: {
-		type: [String],
+		type: [
+			{
+				title: String,
+			},
+		],
 		default: [],
 	},
+
 	todo: {
-		type: [String],
+		type: [
+			{
+				title: String,
+			},
+		],
 		default: [],
 	},
+
 	doing: {
-		type: [String],
+		type: [
+			{
+				title: String,
+			},
+		],
 		default: [],
 	},
+
 	done: {
-		type: [String],
+		type: [
+			{
+				title: String,
+			},
+		],
 		default: [],
 	},
 	project: {

@@ -131,6 +131,11 @@ const projectSchema = new Schema<Project>(
 				default: null,
 			},
 		},
+
+		tags: {
+			type: [String],
+			default: [],
+		},
 	},
 	{
 		timestamps: true,
