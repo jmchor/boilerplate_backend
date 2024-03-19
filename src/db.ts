@@ -12,10 +12,8 @@ if (!MONGODB_URI) {
 export const connectToMongoDB = async (): Promise<void> => {
 	try {
 		await mongoose.connect(MONGODB_URI);
-		console.log('connected to MongoDB');
+		console.log('🌱 connected to MongoDB');
 	} catch (error) {
 		console.error('error connection to MongoDB:', error.message);
 	}
 };
-
-void connectToMongoDB();
