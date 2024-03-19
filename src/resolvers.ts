@@ -4,14 +4,8 @@ import { GraphQLError } from 'graphql';
 import { genSaltSync, hashSync } from 'bcrypt-ts';
 import mongoose, { ClientSession } from 'mongoose';
 import jwt from 'jsonwebtoken';
-
-import { ProjectModel } from './models/Project.model.js';
-import { ArticleModel } from './models/Article.model.js';
-import { UserModel } from './models/User.model.js';
-import { KanbanModel } from './models/Kanban.model.js';
-
-import { Article, Authenticationstatus, LogoutResponse, Project, Resolvers, Token, User } from './types.js';
 import {
+	CreateKanbanArgs,
 	BaseArgs,
 	CreateProjectArgs,
 	CreateArticleArgs,
@@ -26,7 +20,26 @@ import {
 	UserContext,
 	ReqResContext,
 	CreateUserArgs,
-} from './types/argTypes.js';
+	EditKanbanArgs,
+} from './types/argTypes';
+
+import { ProjectModel } from './models/Project.model.js';
+import { ArticleModel } from './models/Article.model.js';
+import { UserModel } from './models/User.model.js';
+import { KanbanModel } from './models/Kanban.model.js';
+
+import {
+	Article,
+	Authenticationstatus,
+	Kanban,
+	LogoutResponse,
+	Project,
+	Resolvers,
+	TagWithType,
+	Title,
+	Token,
+	User,
+} from './types.js';
 
 import { generateInstallCommands } from './scripts/installCommands.js';
 import { checkLoggedInUser } from './utils/checkLoggedInUser.js';
@@ -86,10 +99,39 @@ const resolvers: Resolvers = {
 			return populatedProjects;
 		},
 
-		findProject: async (_, { _id }: BaseArgs, { currentUser }: UserContext): Promise<Project> => {
-			checkLoggedInUser(currentUser);
+		findKanban: async (_, { _id }: BaseArgs, { currentUser }: UserContext): Promise<Kanban> => {
+			// checkLoggedInUser(currentUser);
 
-			const project = await ProjectModel.findById(_id);
+			const kanban = await KanbanModel.findById(_id);
+
+			if (!kanban) {
+				throw new GraphQLError('Kanban not found', {
+					extensions: {
+						code: 'NOT_FOUND',
+						invalidArgs: _id,
+					},
+				});
+			}
+
+			return kanban;
+		},
+
+		findProject: async (_, { _id }: BaseArgs, { currentUser }: UserContext): Promise<Project> => {
+			// checkLoggedInUser(currentUser);
+
+			const project = await ProjectModel.findById(_id)
+				.populate({
+					path: 'createdBy',
+					model: UserModel,
+				})
+				.populate({
+					path: 'articles',
+					model: ArticleModel,
+				})
+				.populate({
+					path: 'kanban',
+					model: KanbanModel,
+				});
 
 			if (!project) {
 				throw new GraphQLError('Project not found', {
@@ -100,10 +142,7 @@ const resolvers: Resolvers = {
 				});
 			}
 
-			return project.populate({
-				path: 'createdBy',
-				model: UserModel,
-			});
+			return project;
 		},
 		allArticles: async (): Promise<Article[]> => {
 			const articles = await ArticleModel.find().sort({ createdAt: -1 }); // Sort by createdAt in descending order
@@ -120,11 +159,18 @@ const resolvers: Resolvers = {
 					});
 				})
 			);
-
 			return populatedArticles;
 		},
 		findArticle: async (_, { _id }: BaseArgs): Promise<Article> => {
-			const article = await ArticleModel.findById(_id);
+			const article = await ArticleModel.findById(_id)
+				.populate({
+					path: 'createdBy',
+					model: UserModel,
+				})
+				.populate({
+					path: 'linkedProjects',
+					model: ProjectModel,
+				});
 
 			if (!article) {
 				throw new GraphQLError('Article not found', {
@@ -135,10 +181,43 @@ const resolvers: Resolvers = {
 				});
 			}
 
-			return article.populate({
-				path: 'createdBy',
-				model: UserModel,
-			});
+			return article;
+		},
+
+		allTags: async (): Promise<TagWithType[]> => {
+			try {
+				// Retrieve distinct tags from both ArticleModel and ProjectModel
+				const articleTags = await ArticleModel.distinct('tags');
+				const projectTags = await ProjectModel.distinct('tags');
+
+				// Combine the arrays and make them unique
+				const allTags = [...articleTags, ...projectTags];
+				const uniqueTags = Array.from(new Set(allTags));
+
+				const allTagsWithType = uniqueTags.map((tag) => ({ tag, type: 'tag' }));
+
+				return allTagsWithType;
+			} catch (error) {
+				throw new GraphQLError(`Failed to fetch all tags: ${error.message}`);
+			}
+		},
+
+		allTitles: async (): Promise<Title[]> => {
+			try {
+				// Retrieve distinct titles from both ArticleModel and ProjectModel
+				const articleTitles = await ArticleModel.distinct('title');
+				const projectTitles = await ProjectModel.distinct('title');
+
+				// Combine the arrays and make them unique
+				const allTitles = [
+					...articleTitles.map((title) => ({ title, type: 'article' })),
+					...projectTitles.map((title) => ({ title, type: 'project' })),
+				];
+
+				return allTitles;
+			} catch (error) {
+				throw new GraphQLError(`Failed to fetch all titles: ${error.message}`);
+			}
 		},
 
 		currentUser: async (_, __, { req }: ReqResContext): Promise<User> => {
@@ -192,6 +271,75 @@ const resolvers: Resolvers = {
 
 			return projects;
 		},
+
+		// ------------------------ Search ----------------------------------------
+
+		searchProjectsByTag: async (
+			_,
+			{ tag }: { tag: string },
+			{ req }: ReqResContext
+		): Promise<Project[]> => {
+			// const { currentUser } = req;
+			// checkLoggedInUser(currentUser);
+
+			try {
+				const projects = await ProjectModel.find({ tags: { $in: tag } }).populate({
+					path: 'createdBy',
+					model: UserModel,
+				});
+				return projects;
+			} catch (error) {
+				throw new GraphQLError('No projects found');
+			}
+		},
+
+		searchProject: async (_, { title }: { title: string }, { req }: ReqResContext): Promise<string> => {
+			// const { currentUser } = req;
+			// checkLoggedInUser(currentUser);
+
+			try {
+				const project: Project = await ProjectModel.findOne({ title });
+
+				return project._id;
+			} catch (error) {
+				throw new GraphQLError('No projects found');
+			}
+		},
+
+		searchArticlesByTag: async (
+			_,
+			{ tag }: { tag: string },
+			{ req }: ReqResContext
+		): Promise<Article[]> => {
+			// const { currentUser } = req;
+			// checkLoggedInUser(currentUser);
+
+			try {
+				const articles = await ArticleModel.find({ tags: { $in: tag } });
+
+				return articles || [];
+			} catch (error) {
+				throw new GraphQLError('No articles found');
+				return [];
+			}
+		},
+
+		searchArticleByTitle: async (
+			_,
+			{ title }: { title: string },
+			{ req }: ReqResContext
+		): Promise<string> => {
+			// const { currentUser } = req;
+			// checkLoggedInUser(currentUser);
+
+			try {
+				const article: Article = await ArticleModel.findOne({ title });
+
+				return article._id;
+			} catch (error) {
+				throw new GraphQLError('No articles found');
+			}
+		},
 	},
 
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -199,12 +347,12 @@ const resolvers: Resolvers = {
 	Mutation: {
 		createProject: async (
 			parent,
-			{ title, description, createdBy, frontend, backend }: CreateProjectArgs,
+			{ title, description, createdBy, frontend, backend, tags }: CreateProjectArgs,
 			{ req }: ReqResContext
 		): Promise<Project> => {
 			const { currentUser } = req;
 
-			checkLoggedInUser(currentUser);
+			// checkLoggedInUser(currentUser);
 
 			try {
 				const existingProject = await ProjectModel.findOne({ title });
@@ -223,7 +371,82 @@ const resolvers: Resolvers = {
 					backend: {
 						...backend,
 					},
+					tags: [...tags] || [],
 				};
+
+				switch (newProjectData.frontend.framework as string) {
+					case 'reactts':
+						newProjectData.tags.push('react', 'typescript');
+						break;
+					case 'vanillajs':
+						newProjectData.tags.push('javascript');
+						break;
+					case 'nextjs':
+						newProjectData.tags.push('nextjs');
+						break;
+					case 'reactjs':
+						newProjectData.tags.push('react');
+						break;
+					default:
+						// Handle default case if needed
+						break;
+				}
+
+				switch (newProjectData.backend.environment as string) {
+					case 'nodets':
+						newProjectData.tags.push('typescript', 'nodejs');
+						break;
+					case 'nodejs':
+						newProjectData.tags.push('nodejs');
+						break;
+					case 'nodeExpressTS':
+						newProjectData.tags.push('nodejs', 'express', 'typescript');
+						break;
+					case 'nodeExpressJS':
+						newProjectData.tags.push('nodejs', 'express');
+						break;
+					default:
+						// Handle default case if needed
+						break;
+				}
+
+				switch (newProjectData.backend.moduleType as string) {
+					case 'commonjs':
+						newProjectData.tags.push('commonjs');
+						break;
+					case 'module':
+						newProjectData.tags.push('module');
+						break;
+					default:
+						// Handle default case if needed
+						break;
+				}
+
+				switch (newProjectData.backend.cms as string) {
+					case 'keystoneJS':
+						newProjectData.tags.push('keystonejs');
+						break;
+					case 'strapi':
+						newProjectData.tags.push('strapi');
+						break;
+					default:
+						// Handle default case if needed
+						break;
+				}
+
+				switch (newProjectData.backend.database as string) {
+					case 'mongodb':
+						newProjectData.tags.push('mongodb');
+						break;
+					case 'postgres':
+						newProjectData.tags.push('postgres');
+						break;
+					default:
+						// Handle default case if needed
+						break;
+				}
+
+				newProjectData.tags = Array.from(new Set(newProjectData.tags));
 
 				const newProject = await new ProjectModel(newProjectData).save();
 
@@ -313,9 +536,9 @@ const resolvers: Resolvers = {
 		): Promise<Project> => {
 			try {
 				const { currentUser } = req;
-				checkLoggedInUser(currentUser);
+				// checkLoggedInUser(currentUser);
 
-				checkUserIsAuthor(currentUser, createdBy);
+				// checkUserIsAuthor(currentUser, createdBy);
 
 				if (!_id) {
 					throw new GraphQLError('Invalid project ID', {
@@ -367,6 +590,78 @@ const resolvers: Resolvers = {
 				});
 
 				return false;
+			}
+		},
+
+		createKanban: async (
+			_,
+			{ backlog, todo, doing, done, project, createdBy }: CreateKanbanArgs,
+			{ req }: ReqResContext
+		): Promise<Kanban> => {
+			const { currentUser } = req;
+			// checkLoggedInUser(currentUser);
+			// checkUserIsAuthor(currentUser, createdBy);
+			try {
+				const newKanban = new KanbanModel({
+					backlog,
+					todo,
+					doing,
+					done,
+					project,
+				});
+				await newKanban.save();
+
+				const updatedProject = await ProjectModel.findByIdAndUpdate(
+					project,
+					{
+						kanban: newKanban._id,
+					},
+					{ new: true }
+				);
+
+				return newKanban;
+			} catch (error) {
+				throw new GraphQLError('Failed to create kanban', {
+					extensions: {
+						code: 'INTERNAL_SERVER_ERROR',
+						invalidArgs: project,
+						backlog,
+						todo,
+						doing,
+						done,
+					},
+				});
+			}
+		},
+
+		editKanban: async (
+			_,
+			{ _id, backlog, todo, doing, done, createdBy }: EditKanbanArgs,
+			{ req }: ReqResContext
+		): Promise<Kanban> => {
+			// const { currentUser } = req;
+			// checkLoggedInUser(currentUser);
+			// checkUserIsAuthor(currentUser, createdBy);
+			try {
+				const updatedKanban = await KanbanModel.findByIdAndUpdate(
+					_id,
+					{
+						backlog,
+						todo,
+						doing,
+						done,
+					},
+					{ new: true }
+				);
+
+				return updatedKanban;
+			} catch (error) {
+				throw new GraphQLError('Failed to edit kanban', {
+					extensions: {
+						code: 'INTERNAL_SERVER_ERROR',
+						invalidArgs: _id,
+					},
+				});
 			}
 		},
 
@@ -467,7 +762,7 @@ const resolvers: Resolvers = {
 			const session: ClientSession = await mongoose.startSession();
 			session.startTransaction();
 
-			checkLoggedInUser(currentUser);
+			// checkLoggedInUser(currentUser);
 
 			try {
 				// Check if _id is valid (you might want to add more validation here)
@@ -527,8 +822,8 @@ const resolvers: Resolvers = {
 			{ _id, title, text, subheadline, tags, imageUrl, externalLink, createdBy }: EditArticleArgs,
 			{ currentUser }: UserContext
 		): Promise<Article> => {
-			checkLoggedInUser(currentUser);
-			checkUserIsAuthor(currentUser, createdBy);
+			// checkLoggedInUser(currentUser);
+			// checkUserIsAuthor(currentUser, createdBy);
 
 			const cleanText = sanitizeText(text);
 
@@ -544,11 +839,16 @@ const resolvers: Resolvers = {
 						externalLink,
 					},
 					{ new: true }
-				);
-				return article.populate({
-					path: 'createdBy',
-					model: UserModel,
-				});
+				)
+					.populate({
+						path: 'linkedProjects',
+						model: ProjectModel,
+					})
+					.populate({
+						path: 'createdBy',
+						model: UserModel,
+					});
+				return article;
 			} catch (error) {
 				throw new GraphQLError('Failed to edit article', {
 					extensions: {
