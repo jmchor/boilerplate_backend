@@ -881,7 +881,7 @@ const resolvers: Resolvers = {
 			}
 		},
 
-		createUser: async (_, { username, email, password, image }: CreateUserArgs): Promise<User> => {
+		createUser: async (_, { username, email, password, imageUrl }: CreateUserArgs): Promise<User> => {
 			try {
 				inputRegex(email, 'email');
 
@@ -899,11 +899,11 @@ const resolvers: Resolvers = {
 
 				let defaultImage: string;
 
-				if (image === '' || !image) {
+				if (imageUrl === '' || !imageUrl) {
 					defaultImage =
 						'https://res.cloudinary.com/dompqbumr/image/upload/v1709477275/codeBase/default_boiler.svg';
 				} else {
-					defaultImage = image;
+					defaultImage = imageUrl;
 				}
 
 				// need to has the password
@@ -913,7 +913,7 @@ const resolvers: Resolvers = {
 				const user = new UserModel({
 					username,
 					email,
-					image: defaultImage,
+					imageUrl: defaultImage,
 					passwordHash: hashedPassword,
 				});
 
@@ -934,32 +934,35 @@ const resolvers: Resolvers = {
 
 		editUser: async (
 			_,
-			{ _id, username, email }: EditUserArgs,
+			{ _id, username, email, imageUrl }: EditUserArgs,
 			{ currentUser }: UserContext
 		): Promise<User> => {
-			checkLoggedInUser(currentUser);
-			checkUserIsAuthor(currentUser, _id);
+			// checkLoggedInUser(currentUser);
+			// checkUserIsAuthor(currentUser, _id);
 
 			inputRegex(email, 'email');
 
 			try {
-				const existingEmail = await UserModel.findOne({ email });
+				// const existingEmail = await UserModel.findOne({ email });
 
-				if (existingEmail) {
-					throw new GraphQLError(`User with email ${email} already exists`);
-				}
+				// if (existingEmail) {
+				// 	throw new GraphQLError(`User with email ${email} already exists`);
+				// }
 
-				const existingUsername = await UserModel.findOne({ username });
+				// const existingUsername = await UserModel.findOne({ username });
 
-				if (existingUsername) {
-					throw new GraphQLError(`User with username ${username} already exists`);
-				}
+				// if (existingUsername) {
+				// 	throw new GraphQLError(`User with username ${username} already exists`);
+				// }
+
+				console.log(username, email, imageUrl, 'ID: ', _id);
 
 				const updateUser = await UserModel.findByIdAndUpdate(
 					_id,
 					{
 						username,
 						email,
+						imageUrl,
 					},
 					{ new: true }
 				);
@@ -971,6 +974,7 @@ const resolvers: Resolvers = {
 						invalidArgs: _id,
 						username,
 						email,
+						imageUrl,
 						error,
 					},
 				});

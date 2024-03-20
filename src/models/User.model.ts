@@ -24,7 +24,7 @@ const userSchema = new Schema<User>(
 			required: [true, 'Password is required.'],
 			minlength: 6,
 		},
-		image: {
+		imageUrl: {
 			type: String,
 			default: '',
 		},

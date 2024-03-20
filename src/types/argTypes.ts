@@ -75,13 +75,13 @@ export interface CreateUserArgs extends BaseArgs {
 	username: string;
 	email: string;
 	password: string;
-	image?: string;
+	imageUrl?: string;
 }
 
 export interface EditUserArgs extends BaseArgs {
 	username: string;
 	email: string;
-	image?: string;
+	imageUrl?: string;
 }
 
 export interface UpdatePasswordArgs extends BaseArgs {

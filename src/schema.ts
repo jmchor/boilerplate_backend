@@ -66,7 +66,7 @@ const typeDefs = gql`
 	type User {
 		username: String!
 		email: String!
-		image: String
+		imageUrl: String
 		passwordHash: String!
 		projects: [Project]
 		articles: [Article]
@@ -295,9 +295,9 @@ const typeDefs = gql`
 			createdBy: ID!
 		): Article
 
-		createUser(username: String!, email: String!, password: String!, image: String): User
+		createUser(username: String!, email: String!, password: String!, imageUrl: String): User
 
-		editUser(_id: ID!, username: String, email: String, image: String): User
+		editUser(_id: ID!, username: String, email: String, imageUrl: String): User
 
 		updatePassword(_id: ID!, oldPassword: String!, newPassword: String!): User
 
