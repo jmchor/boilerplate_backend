@@ -1,6 +1,6 @@
 // packageMappings.ts
 
-import { Packages } from '../types'; // Adjust the import path as needed
+import { Packages } from '../types.js'; // Adjust the import path as needed
 
 export const packageMappings: Record<Packages, string> = {
 	[Packages.GraphqlCodegenCli]: '@graphql-codegen/cli',

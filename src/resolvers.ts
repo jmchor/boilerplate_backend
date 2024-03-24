@@ -935,27 +935,28 @@ const resolvers: Resolvers = {
 		editUser: async (
 			_,
 			{ _id, username, email, imageUrl }: EditUserArgs,
-			{ currentUser }: UserContext
+			{ req }: ReqResContext
 		): Promise<User> => {
+			const { currentUser } = req;
 			// checkLoggedInUser(currentUser);
 			// checkUserIsAuthor(currentUser, _id);
 
 			inputRegex(email, 'email');
 
 			try {
-				// const existingEmail = await UserModel.findOne({ email });
+				if (email !== currentUser.email) {
+					const existingEmail = await UserModel.findOne({ email });
+					if (existingEmail) {
+						throw new GraphQLError(`User with email ${email} already exists`);
+					}
+				}
 
-				// if (existingEmail) {
-				// 	throw new GraphQLError(`User with email ${email} already exists`);
-				// }
-
-				// const existingUsername = await UserModel.findOne({ username });
-
-				// if (existingUsername) {
-				// 	throw new GraphQLError(`User with username ${username} already exists`);
-				// }
-
-				console.log(username, email, imageUrl, 'ID: ', _id);
+				if (username !== currentUser.username) {
+					const existingUsername = await UserModel.findOne({ username });
+					if (existingUsername) {
+						throw new GraphQLError(`User with username ${username} already exists`);
+					}
+				}
 
 				const updateUser = await UserModel.findByIdAndUpdate(
 					_id,
@@ -984,9 +985,11 @@ const resolvers: Resolvers = {
 		updatePassword: async (
 			_,
 			{ _id, oldPassword, newPassword }: UpdatePasswordArgs,
-			{ currentUser }: UserContext
+			{ req }: ReqResContext
 		): Promise<User> => {
-			checkUserIsAuthor(currentUser, _id);
+			// checkUserIsAuthor(currentUser, _id);
+
+			const { currentUser } = req;
 
 			passwordValidation(oldPassword, currentUser.passwordHash);
 
@@ -1008,11 +1011,8 @@ const resolvers: Resolvers = {
 			return updateUser;
 		},
 
-		deleteUser: async (
-			_,
-			{ _id, password }: DeleteUser,
-			{ currentUser }: UserContext
-		): Promise<boolean> => {
+		deleteUser: async (_, { _id, password }: DeleteUser, { req }: ReqResContext): Promise<boolean> => {
+			const { currentUser } = req;
 			checkLoggedInUser(currentUser);
 			passwordValidation(password, currentUser.passwordHash);
 
