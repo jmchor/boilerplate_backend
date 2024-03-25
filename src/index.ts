@@ -54,12 +54,12 @@ async function startServer() {
 	});
 
 	await server.start();
-	server.applyMiddleware({ app, cors: false });
+	server.applyMiddleware({ app, path: '/graphql', cors: false });
 
 	await connectToMongoDB();
 
 	app.listen({ port: 4000 }, () => {
-		console.log(`🚀 Server ready at http://localhost:4000`);
+		console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
 	});
 }
 
