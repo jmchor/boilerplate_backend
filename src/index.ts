@@ -14,6 +14,8 @@ import { ReqWithUserAndCookies } from './types/argTypes.js';
 config();
 
 const ORIGIN = process.env.ORIGIN || 'http://localhost:5173';
+
+console.log(`ORIGIN: ${ORIGIN}`);
 async function startServer() {
 	const app = express();
 
