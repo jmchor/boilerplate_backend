@@ -3,6 +3,7 @@ import express, { Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
+import { config } from 'dotenv';
 
 import { connectToMongoDB } from './db.js';
 import typeDefs from './schema.js';
@@ -10,13 +11,16 @@ import resolvers from './resolvers.js';
 import { UserModel } from './models/User.model.js';
 import { ReqWithUserAndCookies } from './types/argTypes.js';
 
+config();
+
+const ORIGIN = process.env.ORIGIN || 'http://localhost:5173';
 async function startServer() {
 	const app = express();
 
 	app.use(cookieParser());
 
 	const corsOptions = {
-		origin: 'http://localhost:5173',
+		origin: ORIGIN,
 		credentials: true,
 	};
 
@@ -48,12 +52,12 @@ async function startServer() {
 	});
 
 	await server.start();
-	server.applyMiddleware({ app, path: '/graphql', cors: false });
+	server.applyMiddleware({ app, cors: false });
 
 	await connectToMongoDB();
 
 	app.listen({ port: 4000 }, () => {
-		console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
+		console.log(`🚀 Server ready at http://localhost:4000`);
 	});
 }
 
