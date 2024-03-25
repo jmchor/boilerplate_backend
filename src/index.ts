@@ -36,6 +36,7 @@ async function startServer() {
 
 			if (token) {
 				// Token is present, proceed with decoding and retrieving the current user
+				console.log('Checking if token is valid...');
 				const decodedToken = jwt.verify(token, process.env.JWT_SECRET) as { userId: string };
 				const currentUser = await UserModel.findById(decodedToken.userId);
 				req.currentUser = currentUser;
