@@ -32,11 +32,13 @@ async function startServer() {
 	app.use(async (req: ReqWithUserAndCookies, res: Response, next) => {
 		try {
 			// Check if token is present in the cookies
+
+			console.log(req.cookies);
 			const { token } = req.cookies as { token?: string };
 
 			if (token) {
 				// Token is present, proceed with decoding and retrieving the current user
-				console.log('Checking if token is valid...');
+
 				const decodedToken = jwt.verify(token, process.env.JWT_SECRET) as { userId: string };
 				const currentUser = await UserModel.findById(decodedToken.userId);
 				req.currentUser = currentUser;
