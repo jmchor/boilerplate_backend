@@ -312,7 +312,10 @@ const resolvers: Resolvers = {
 			{ req }: ReqResContext
 		): Promise<Article[]> => {
 			try {
-				const articles = await ArticleModel.find({ tags: { $in: tag } });
+				const articles = await ArticleModel.find({ tags: { $in: tag } }).populate({
+					path: 'createdBy',
+					model: UserModel,
+				});
 
 				return articles || [];
 			} catch (error) {
