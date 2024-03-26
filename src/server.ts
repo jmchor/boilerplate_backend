@@ -33,7 +33,6 @@ async function startServer() {
 		try {
 			// Check if token is present in the cookies
 
-			console.log(req.cookies);
 			const { token } = req.cookies as { token?: string };
 
 			if (token) {

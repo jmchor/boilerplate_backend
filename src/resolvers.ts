@@ -222,7 +222,7 @@ const resolvers: Resolvers = {
 
 		currentUser: async (_, __, { req }: ReqResContext): Promise<User> => {
 			const { currentUser } = req;
-			checkLoggedInUser(currentUser);
+			// checkLoggedInUser(currentUser);
 
 			const user: User = await UserModel.findById(currentUser._id)
 				.populate({
