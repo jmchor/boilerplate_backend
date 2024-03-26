@@ -60,8 +60,8 @@ async function startServer() {
 
 	await connectToMongoDB();
 
-	app.listen({ port: 4000 }, () => {
-		console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
+	app.listen({ port: 4444 }, () => {
+		console.log(`🚀 Server ready at http://localhost:4444${server.graphqlPath}`);
 	});
 }
 
