@@ -99,7 +99,8 @@ const resolvers: Resolvers = {
 			return populatedProjects;
 		},
 
-		findKanban: async (_, { _id }: BaseArgs, { currentUser }: UserContext): Promise<Kanban> => {
+		findKanban: async (_, { _id }: BaseArgs, { req }: ReqResContext): Promise<Kanban> => {
+			// const { currentUser } = req;
 			// checkLoggedInUser(currentUser);
 
 			const kanban = await KanbanModel.findById(_id);
@@ -222,7 +223,6 @@ const resolvers: Resolvers = {
 
 		currentUser: async (_, __, { req }: ReqResContext): Promise<User> => {
 			const { currentUser } = req;
-			// checkLoggedInUser(currentUser);
 
 			const user: User = await UserModel.findById(currentUser._id)
 				.populate({
@@ -252,25 +252,25 @@ const resolvers: Resolvers = {
 			return user;
 		},
 
-		myProjects: async (_, __, { currentUser }: UserContext): Promise<Project[]> => {
-			checkLoggedInUser(currentUser);
+		// myProjects: async (_, __, { currentUser }: UserContext): Promise<Project[]> => {
+		// 	checkLoggedInUser(currentUser);
 
-			const projects = await ProjectModel.find({ createdBy: currentUser._id })
-				.populate({
-					path: 'articles',
-					model: ArticleModel,
-				})
-				.populate({
-					path: 'kanban',
-					model: KanbanModel,
-				});
+		// 	const projects = await ProjectModel.find({ createdBy: currentUser._id })
+		// 		.populate({
+		// 			path: 'articles',
+		// 			model: ArticleModel,
+		// 		})
+		// 		.populate({
+		// 			path: 'kanban',
+		// 			model: KanbanModel,
+		// 		});
 
-			if (!projects) {
-				throw new GraphQLError('No projects found');
-			}
+		// 	if (!projects) {
+		// 		throw new GraphQLError('No projects found');
+		// 	}
 
-			return projects;
-		},
+		// 	return projects;
+		// },
 
 		// ------------------------ Search ----------------------------------------
 
@@ -294,8 +294,8 @@ const resolvers: Resolvers = {
 		},
 
 		searchProject: async (_, { title }: { title: string }, { req }: ReqResContext): Promise<string> => {
-			// const { currentUser } = req;
-			// checkLoggedInUser(currentUser);
+			const { currentUser } = req;
+			checkLoggedInUser(currentUser);
 
 			try {
 				const project: Project = await ProjectModel.findOne({ title });
@@ -311,9 +311,6 @@ const resolvers: Resolvers = {
 			{ tag }: { tag: string },
 			{ req }: ReqResContext
 		): Promise<Article[]> => {
-			// const { currentUser } = req;
-			// checkLoggedInUser(currentUser);
-
 			try {
 				const articles = await ArticleModel.find({ tags: { $in: tag } });
 
@@ -329,9 +326,6 @@ const resolvers: Resolvers = {
 			{ title }: { title: string },
 			{ req }: ReqResContext
 		): Promise<string> => {
-			// const { currentUser } = req;
-			// checkLoggedInUser(currentUser);
-
 			try {
 				const article: Article = await ArticleModel.findOne({ title });
 
@@ -342,15 +336,13 @@ const resolvers: Resolvers = {
 		},
 	},
 
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-
 	Mutation: {
 		createProject: async (
 			parent,
 			{ title, description, createdBy, frontend, backend, tags }: CreateProjectArgs,
 			{ req }: ReqResContext
 		): Promise<Project> => {
-			const { currentUser } = req;
+			// const { currentUser } = req;
 
 			// checkLoggedInUser(currentUser);
 
@@ -365,13 +357,9 @@ const resolvers: Resolvers = {
 					title,
 					description,
 					createdBy,
-					frontend: {
-						...frontend,
-					},
-					backend: {
-						...backend,
-					},
-					tags: [...tags] || [],
+					frontend,
+					backend,
+					tags: [],
 				};
 
 				switch (newProjectData.frontend.framework as string) {

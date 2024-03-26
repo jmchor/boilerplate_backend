@@ -9,7 +9,7 @@ export interface EditProjectArgs extends BaseArgs {
 	title: string;
 	description: string;
 	createdBy: string;
-	tags: string[];
+	tags?: string[];
 }
 
 export interface CreateProjectArgs extends EditProjectArgs {
