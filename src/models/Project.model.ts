@@ -15,6 +15,10 @@ const projectSchema = new Schema<Project>(
 		description: {
 			type: String,
 		},
+		imageUrl: {
+			type: String,
+			default: '/background.jpg',
+		},
 		createdBy: {
 			type: Schema.Types.ObjectId,
 			ref: 'UserModel',
