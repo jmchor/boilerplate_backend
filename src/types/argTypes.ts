@@ -10,6 +10,7 @@ export interface EditProjectArgs extends BaseArgs {
 	description: string;
 	createdBy: string;
 	tags?: string[];
+	imageUrl?: string;
 }
 
 export interface CreateProjectArgs extends EditProjectArgs {

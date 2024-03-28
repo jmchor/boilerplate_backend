@@ -213,6 +213,7 @@ export type MutationCreateProjectArgs = {
   createdBy: Scalars['ID']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
   frontend: FrontendConfigInput;
+  imageUrl?: InputMaybe<Scalars['String']['input']>;
   installScripts?: InputMaybe<InstallScriptsInput>;
   kanban?: InputMaybe<KanbanInput>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -277,6 +278,7 @@ export type MutationEditProjectArgs = {
   _id: Scalars['ID']['input'];
   createdBy: Scalars['ID']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
+  imageUrl?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   title?: InputMaybe<Scalars['String']['input']>;
 };
@@ -344,6 +346,7 @@ export type Project = {
   createdBy?: Maybe<User>;
   description?: Maybe<Scalars['String']['output']>;
   frontend?: Maybe<FrontendConfig>;
+  imageUrl?: Maybe<Scalars['String']['output']>;
   installScripts?: Maybe<InstallScripts>;
   kanban?: Maybe<Kanban>;
   tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
@@ -676,6 +679,7 @@ export type ProjectResolvers<ContextType = any, ParentType extends ResolversPare
   createdBy?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   frontend?: Resolver<Maybe<ResolversTypes['FrontendConfig']>, ParentType, ContextType>;
+  imageUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   installScripts?: Resolver<Maybe<ResolversTypes['InstallScripts']>, ParentType, ContextType>;
   kanban?: Resolver<Maybe<ResolversTypes['Kanban']>, ParentType, ContextType>;
   tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;

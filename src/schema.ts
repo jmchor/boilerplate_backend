@@ -103,6 +103,7 @@ const typeDefs = gql`
 	type Project {
 		title: String
 		description: String
+		imageUrl: String
 		createdBy: User
 		frontend: FrontendConfig
 		backend: BackendConfig
@@ -234,6 +235,7 @@ const typeDefs = gql`
 		createProject(
 			title: String!
 			description: String
+			imageUrl: String
 			createdBy: ID!
 			frontend: FrontendConfigInput!
 			backend: BackendConfigInput!
@@ -244,7 +246,14 @@ const typeDefs = gql`
 		): Project
 		addInstallScript(_id: ID!): Project
 
-		editProject(_id: ID!, title: String, description: String, createdBy: ID!, tags: [String]): Project
+		editProject(
+			_id: ID!
+			title: String
+			description: String
+			imageUrl: String
+			createdBy: ID!
+			tags: [String]
+		): Project
 
 		deleteProject(_id: ID!, createdBy: ID!): Boolean
 
