@@ -342,7 +342,7 @@ const resolvers: Resolvers = {
 	Mutation: {
 		createProject: async (
 			parent,
-			{ title, description, createdBy, frontend, backend, tags }: CreateProjectArgs,
+			{ title, description, imageUrl, createdBy, frontend, backend, tags }: CreateProjectArgs,
 			{ req }: ReqResContext
 		): Promise<Project> => {
 			// const { currentUser } = req;
@@ -359,6 +359,7 @@ const resolvers: Resolvers = {
 				const newProjectData = {
 					title,
 					description,
+					imageUrl,
 					createdBy,
 					frontend,
 					backend,
@@ -511,6 +512,7 @@ const resolvers: Resolvers = {
 						code: 'INTERNAL_SERVER_ERROR',
 						invalidArgs: title,
 						description,
+						imageUrl,
 						createdBy,
 						frontend,
 						backend,
@@ -522,7 +524,7 @@ const resolvers: Resolvers = {
 
 		editProject: async (
 			_,
-			{ _id, title, description, createdBy }: EditProjectArgs,
+			{ _id, title, description, imageUrl, createdBy }: EditProjectArgs,
 			{ req }: ReqResContext
 		): Promise<Project> => {
 			try {
@@ -545,6 +547,7 @@ const resolvers: Resolvers = {
 					{
 						title,
 						description,
+						imageUrl,
 					},
 					{ new: true }
 				);
