@@ -681,7 +681,7 @@ const resolvers: Resolvers = {
 		createArticle: async (
 			_,
 			{ title, text, subheadline, tags, imageUrl, externalLink, createdBy }: CreateArticleArgs,
-			{ currentUser }: UserContext
+			{ req }: ReqResContext
 		): Promise<Article> => {
 			// checkLoggedInUser(currentUser);
 
@@ -856,10 +856,13 @@ const resolvers: Resolvers = {
 		deleteArticle: async (
 			_,
 			{ _id, createdBy }: DeleteDocument,
-			{ currentUser }: UserContext
+			{ req }: ReqResContext
 		): Promise<boolean> => {
-			checkLoggedInUser(currentUser);
-			checkUserIsAuthor(currentUser, createdBy);
+			// checkLoggedInUser(currentUser);
+			const { currentUser } = req;
+			if (currentUser) {
+				checkUserIsAuthor(currentUser, createdBy);
+			}
 
 			try {
 				await ArticleModel.findByIdAndDelete(_id);
