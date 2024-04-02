@@ -529,9 +529,9 @@ const resolvers: Resolvers = {
 		): Promise<Project> => {
 			try {
 				const { currentUser } = req;
-				// checkLoggedInUser(currentUser);
+				checkLoggedInUser(currentUser);
 
-				// checkUserIsAuthor(currentUser, createdBy);
+				checkUserIsAuthor(currentUser, createdBy);
 
 				if (!_id) {
 					throw new GraphQLError('Invalid project ID', {
