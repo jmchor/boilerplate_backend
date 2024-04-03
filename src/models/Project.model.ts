@@ -17,7 +17,7 @@ const projectSchema = new Schema<Project>(
 		},
 		imageUrl: {
 			type: String,
-			default: '/background.jpg',
+			default: '/background2.jpg',
 		},
 		createdBy: {
 			type: Schema.Types.ObjectId,
