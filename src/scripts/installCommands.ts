@@ -64,25 +64,33 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 		const frontendCommands: string[] = [];
 		const backendCommands: string[] = [];
 
-		const kebabCaseTitle = title.toLowerCase().replace(/\s+/g, '-');
+		const camelCaseTitle = title.toLowerCase().replace(/\s+/g, '-');
 
 		const frontendPackages = [...frontPackages];
 		const backendPackages = [...backPackages];
 
 		// Frontend framework specific commands
-		if (framework === Reactts) {
-			frontendCommands.push(
-				`<li>npm create vite@latest ${kebabCaseTitle} -- --template react-ts</li>`
-			);
-			frontendCommands.push(`<li>cd ${kebabCaseTitle}</li>`);
-			frontendPackages.push(Tsx, Tsup, Nodemon);
-		} else if (framework === Nextjs) {
-			frontendCommands.push(`<li>npx create-next-app ${kebabCaseTitle}</li>`);
-			frontendCommands.push(`<li>cd ${kebabCaseTitle}</li>`);
-		} else if (framework === Reactjs) {
-			frontendCommands.push(`<li>npm create vite@latest ${kebabCaseTitle} -- --template react</li>`);
-			frontendCommands.push(`<li>cd ${kebabCaseTitle}</li>`);
-			frontendPackages.push(Nodemon);
+		switch (framework) {
+			case Reactts:
+				frontendCommands.push(
+					`<li>npm create vite@latest ${camelCaseTitle} -- --template react-ts</li>`
+				);
+				frontendCommands.push(`<li>cd ${camelCaseTitle}</li>`);
+				frontendPackages.push(Tsx, Tsup, Nodemon);
+				break;
+			case Nextjs:
+				frontendCommands.push(`<li>npx create-next-app ${camelCaseTitle}</li>`);
+				frontendCommands.push(`<li>cd ${camelCaseTitle}</li>`);
+				break;
+			case Reactjs:
+				frontendCommands.push(
+					`<li>npm create vite@latest ${camelCaseTitle} -- --template react</li>`
+				);
+				frontendCommands.push(`<li>cd ${camelCaseTitle}</li>`);
+				frontendPackages.push(Nodemon);
+				break;
+			default:
+				break;
 		}
 
 		// Frontend data layer specific commands
@@ -110,8 +118,8 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 		// }
 
 		// Backend setup commands
-		backendCommands.push(`<li>mkdir ${kebabCaseTitle}-backend</li>`);
-		backendCommands.push(`<li>cd ${kebabCaseTitle}-backend</li>`);
+		backendCommands.push(`<li>mkdir ${camelCaseTitle}-backend</li>`);
+		backendCommands.push(`<li>cd ${camelCaseTitle}-backend</li>`);
 		backendCommands.push('<li>npm init -y</li>');
 
 		if (environment === Nodets || environment === NodeExpressTs) {
@@ -146,11 +154,11 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 		// Backend data layer specific commands
 
 		if (cms === KeystoneJs) {
-			backendCommands.push(`<li>cd ${kebabCaseTitle}-backend</li>`);
+			backendCommands.push(`<li>cd ${camelCaseTitle}-backend</li>`);
 			backendCommands.push('<li>npm init keystone-app@latest</li>');
 		} else if (cms === Strapi) {
-			backendCommands.push(`<li>cd ${kebabCaseTitle}-backend</li>`);
-			backendCommands.push(`<li>npx create-strapi-app@latest ${kebabCaseTitle}</li>`);
+			backendCommands.push(`<li>cd ${camelCaseTitle}-backend</li>`);
+			backendCommands.push(`<li>npx create-strapi-app@latest ${camelCaseTitle}</li>`);
 		}
 
 		// Backend module type specific commands
