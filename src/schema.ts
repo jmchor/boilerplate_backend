@@ -61,6 +61,10 @@ const typeDefs = gql`
 		typesNodemon
 		typesPg
 		typesExpress
+		styled_components
+		mui_material
+		emotion_react
+		emotion_styled
 	}
 
 	type User {
