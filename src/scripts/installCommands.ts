@@ -79,9 +79,9 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 		switch (framework) {
 			case Reactts:
 				frontendCommands.push(
-					`<li>npm create vite@latest ${camelCaseTitle} -- --template react-ts</li><li>npm install</li>`
+					`<li>npm create vite@latest ${camelCaseTitle} -- --template react-ts</li>`
 				);
-				frontendCommands.push(`<li>cd ${camelCaseTitle}</li>`);
+				frontendCommands.push(`<li>cd ${camelCaseTitle}</li><li>npm install</li>`);
 				frontendPackages.push(Tsx, Tsup, Nodemon);
 				break;
 			case Nextjs:
@@ -90,9 +90,9 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 				break;
 			case Reactjs:
 				frontendCommands.push(
-					`<li>npm create vite@latest ${camelCaseTitle} -- --template react</li><li>npm install</li>`
+					`<li>npm create vite@latest ${camelCaseTitle} -- --template react</li>`
 				);
-				frontendCommands.push(`<li>cd ${camelCaseTitle}</li>`);
+				frontendCommands.push(`<li>cd ${camelCaseTitle}</li><li>npm install</li>`);
 				frontendPackages.push(Nodemon);
 				break;
 			default:
