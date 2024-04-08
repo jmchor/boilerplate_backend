@@ -361,81 +361,76 @@ const resolvers: Resolvers = {
 					backend,
 					tags: [],
 				};
-
-				if (frontend) {
-					switch (frontend.framework as string) {
-						case 'reactts':
-							newProjectData.tags.push('react', 'typescript');
-							break;
-						case 'vanillajs':
-							newProjectData.tags.push('javascript');
-							break;
-						case 'nextjs':
-							newProjectData.tags.push('nextjs');
-							break;
-						case 'reactjs':
-							newProjectData.tags.push('react');
-							break;
-						default:
-							// Handle default case if needed
-							break;
-					}
+				switch (newProjectData.frontend.framework as string) {
+					case 'reactts':
+						newProjectData.tags.push('react', 'typescript');
+						break;
+					case 'vanillajs':
+						newProjectData.tags.push('javascript');
+						break;
+					case 'nextjs':
+						newProjectData.tags.push('nextjs');
+						break;
+					case 'reactjs':
+						newProjectData.tags.push('react');
+						break;
+					default:
+						// Handle default case if needed
+						break;
 				}
 
-				if (backend) {
-					switch (backend.environment as string) {
-						case 'nodets':
-							newProjectData.tags.push('typescript', 'nodejs');
-							break;
-						case 'nodejs':
-							newProjectData.tags.push('nodejs');
-							break;
-						case 'nodeExpressTS':
-							newProjectData.tags.push('nodejs', 'express', 'typescript');
-							break;
-						case 'nodeExpressJS':
-							newProjectData.tags.push('nodejs', 'express');
-							break;
-						default:
-							// Handle default case if needed
-							break;
-					}
+				switch (newProjectData.frontend.framework as string) {
+					case 'reactts':
+						newProjectData.tags.push('react', 'typescript');
+						break;
+					case 'vanillajs':
+						newProjectData.tags.push('javascript');
+						break;
+					case 'nextjs':
+						newProjectData.tags.push('nextjs');
+						break;
+					case 'reactjs':
+						newProjectData.tags.push('react');
+						break;
+					default:
+						// Handle default case if needed
+						break;
+				}
 
-					switch (backend.moduleType as string) {
-						case 'commonjs':
-							newProjectData.tags.push('commonjs');
-							break;
-						case 'module':
-							newProjectData.tags.push('module');
-							break;
-						default:
-							// Handle default case if needed
-							break;
-					}
+				switch (newProjectData.backend.moduleType as string) {
+					case 'commonjs':
+						newProjectData.tags.push('commonjs');
+						break;
+					case 'module':
+						newProjectData.tags.push('module');
+						break;
+					default:
+						// Handle default case if needed
+						break;
+				}
 
-					switch (backend.cms as string) {
-						case 'keystoneJS':
-							newProjectData.tags.push('keystonejs');
-							break;
-						case 'strapi':
-							newProjectData.tags.push('strapi');
-							break;
-						default:
-							// Handle default case if needed
-							break;
-					}
+				switch (newProjectData.backend.cms as string) {
+					case 'keystoneJS':
+						newProjectData.tags.push('keystonejs');
+						break;
+					case 'strapi':
+						newProjectData.tags.push('strapi');
+						break;
+					default:
+						// Handle default case if needed
+						break;
+				}
 
-					switch (backend.database as string) {
-						case 'mongodb':
-							newProjectData.tags.push('mongodb');
-							break;
-						case 'postgres':
-							newProjectData.tags.push('postgres');
-							break;
-						default:
-							// Handle default case if needed
-							break;
-					}
+				switch (newProjectData.backend.database as string) {
+					case 'mongodb':
+						newProjectData.tags.push('mongodb');
+						break;
+					case 'postgres':
+						newProjectData.tags.push('postgres');
+						break;
+					default:
+						// Handle default case if needed
+						break;
 				}
 
 				newProjectData.tags = Array.from(new Set(newProjectData.tags));
