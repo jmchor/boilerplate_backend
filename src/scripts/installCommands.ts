@@ -79,7 +79,7 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 		switch (framework) {
 			case Reactts:
 				frontendCommands.push(
-					`<li>npm create vite@latest ${camelCaseTitle} -- --template react-ts</li>`
+					`<li>npm create vite@latest ${camelCaseTitle} -- --template react-ts</li><li>npm install</li>`
 				);
 				frontendCommands.push(`<li>cd ${camelCaseTitle}</li>`);
 				frontendPackages.push(Tsx, Tsup, Nodemon);
@@ -90,7 +90,7 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 				break;
 			case Reactjs:
 				frontendCommands.push(
-					`<li>npm create vite@latest ${camelCaseTitle} -- --template react</li>`
+					`<li>npm create vite@latest ${camelCaseTitle} -- --template react</li><li>npm install</li>`
 				);
 				frontendCommands.push(`<li>cd ${camelCaseTitle}</li>`);
 				frontendPackages.push(Nodemon);
