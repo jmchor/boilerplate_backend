@@ -14,8 +14,8 @@ export interface EditProjectArgs extends BaseArgs {
 }
 
 export interface CreateProjectArgs extends EditProjectArgs {
-	frontend: FrontendConfig;
-	backend: BackendConfig;
+	frontend?: FrontendConfig;
+	backend?: BackendConfig;
 }
 
 export interface CreateArticleArgs {

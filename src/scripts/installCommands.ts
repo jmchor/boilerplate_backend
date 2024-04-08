@@ -24,6 +24,8 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 		const { framework, gqlClient, packages: frontPackages } = frontend;
 		const { environment, moduleType, gqlServer, packages: backPackages, database, cms } = backend;
 
+		console.log(backend.environment);
+
 		const {
 			GraphqlCodegenCli,
 			GraphqlCodegenTypescript,
@@ -210,8 +212,18 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 			}
 		}
 
-		project.installScripts.frontend = frontendInstallCommands;
-		project.installScripts.backend = backendInstallCommands;
+		if (environment === null || database === null || moduleType === null) {
+			project.installScripts.backend = '<li>There is no backend setup for this project</li>';
+		} else {
+			project.installScripts.backend = backendInstallCommands;
+		}
+
+		if (framework === null) {
+			project.installScripts.frontend = '<li>There is no frontend setup for this project</li>';
+		} else {
+			project.installScripts.frontend = frontendInstallCommands;
+		}
+
 		project.frontend.packages = uniqueFrontend;
 		project.backend.packages = uniqueBackend;
 
