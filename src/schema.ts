@@ -15,6 +15,7 @@ const typeDefs = gql`
 		reactjs
 		vanillajs
 		nextjs
+		nextts
 	}
 
 	enum BackendEnv {

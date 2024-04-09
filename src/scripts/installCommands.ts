@@ -57,7 +57,7 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 			Typescript,
 		} = Packages;
 
-		const { Nextjs, Reactjs, Reactts } = FrontFrame;
+		const { Nextjs, Reactjs, Reactts, Nextts } = FrontFrame;
 
 		const { Nodets, NodeExpressJs, NodeExpressTs } = BackendEnv;
 
@@ -85,6 +85,10 @@ export const generateInstallCommands = async (projectId: string): Promise<Projec
 				frontendPackages.push(Tsx, Tsup, Nodemon);
 				break;
 			case Nextjs:
+				frontendCommands.push(`<li>npx create-next-app ${camelCaseTitle}</li>`);
+				frontendCommands.push(`<li>cd ${camelCaseTitle}</li>`);
+				break;
+			case Nextts:
 				frontendCommands.push(`<li>npx create-next-app ${camelCaseTitle}</li>`);
 				frontendCommands.push(`<li>cd ${camelCaseTitle}</li>`);
 				break;

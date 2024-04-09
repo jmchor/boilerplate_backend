@@ -27,7 +27,7 @@ const projectSchema = new Schema<Project>(
 		frontend: {
 			framework: {
 				type: String,
-				enum: ['reactts', 'reactjs', 'vanillajs', 'nextjs'],
+				enum: ['reactts', 'reactjs', 'vanillajs', 'nextjs', 'nextts'],
 				default: null,
 			},
 

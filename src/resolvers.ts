@@ -389,6 +389,9 @@ const resolvers: Resolvers = {
 					case 'nextjs':
 						newProjectData.tags.push('nextjs');
 						break;
+					case 'nextts':
+						newProjectData.tags.push('nextjs', 'typescript');
+						break;
 					case 'reactjs':
 						newProjectData.tags.push('react');
 						break;
