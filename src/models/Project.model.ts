@@ -51,6 +51,7 @@ const projectSchema = new Schema<Project>(
 							'mui_material',
 							'emotion_react',
 							'emotion_styled',
+							'stylex',
 						],
 					},
 				],

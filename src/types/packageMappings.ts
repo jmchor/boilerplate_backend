@@ -23,6 +23,7 @@ export const packageMappings: Record<Packages, string> = {
 	[Packages.Nodemon]: 'nodemon',
 	[Packages.Pg]: 'pg',
 	[Packages.StyledComponents]: 'styled-components',
+	[Packages.Stylex]: '@stylexjs/stylex',
 	[Packages.Tsup]: 'tsup',
 	[Packages.Tsx]: 'tsx',
 	[Packages.TypesBcryptjs]: '@types/bcryptjs',

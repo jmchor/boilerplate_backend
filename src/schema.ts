@@ -66,6 +66,7 @@ const typeDefs = gql`
 		mui_material
 		emotion_react
 		emotion_styled
+		stylex
 	}
 
 	type User {

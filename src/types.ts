@@ -331,6 +331,7 @@ export enum Packages {
   Nodemon = 'nodemon',
   Pg = 'pg',
   StyledComponents = 'styled_components',
+  Stylex = 'stylex',
   Tsup = 'tsup',
   Tsx = 'tsx',
   TypesBcryptjs = 'typesBcryptjs',
